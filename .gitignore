@@ -1,0 +1,78 @@
+# Ignore build directories (Visual Studio)
+[Dd]ebug/
+[Dd]ebugPublic/
+[Dd]ist/
+[Dd]ebugOptimized/
+[Dd]ebugAndRelease/
+Release/
+x64/
+x86/
+
+# Ignore Visual Studio's generated files
+.vs/
+.vscode/
+.idea/
+
+# Ignore Visual Studio user-specific settings
+*.user
+*.userosscache
+*.suo
+*.sdf
+*.opensdf
+*.vcxproj.user
+*.vcxproj.filters
+
+# Ignore Visual Studio temporary files
+*.ncb
+*.opt
+*.plg
+*.log
+*.err
+
+# Ignore compiled object files and binaries
+*.obj
+*.pch
+*.pdb
+*.idb
+*.ilk
+*.lib
+*.exp
+*.dll
+*.exe
+
+# Ignore Vulkan SDK files (adjust the path if necessary)
+/vulkan_sdk/
+
+# Ignore CMake build directories
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Makefile
+cmake_install.cmake
+
+# Ignore platform-specific configuration files (e.g., Visual Studio)
+*.config
+
+# Ignore editor-specific files (e.g., Visual Studio Code)
+.vscode/
+
+# Ignore backup files and temp files
+*~
+*.swp
+*.bak
+
+# Ignore dependency management files (e.g., if using external libraries)
+*.a
+*.so
+*.dylib
+*.lib
+*.dll
+
+# Ignore output directories (e.g., from build tools)
+out/
+bin/
+lib/
+
+# Ignore system files (macOS and Linux)
+.DS_Store
+Thumbs.db
