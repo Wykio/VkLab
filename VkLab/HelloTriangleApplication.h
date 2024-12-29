@@ -7,6 +7,7 @@
 #include <iostream>
 #include <vector>
 #include <optional>
+#include <set>
 
 class HelloTriangleApplication {
 public:
@@ -32,12 +33,16 @@ private:
 
     // Vulkan resources
     GLFWwindow* window;
+
     VkInstance instance;
     VkDebugUtilsMessengerEXT debugMessenger;
     VkSurfaceKHR surface;
+
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
     VkDevice device;
+
     VkQueue graphicsQueue;
+    VkQueue presentQueue;
 };
 
 #endif // HELLO_TRIANGLE_APPLICATION_H
