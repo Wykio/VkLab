@@ -8,6 +8,10 @@ const std::vector<const char*> validationLayers = {
     "VK_LAYER_KHRONOS_validation"
 };
 
+const std::vector<const char*> deviceExtensions = {
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME
+};
+
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
 #else
@@ -222,7 +226,25 @@ void HelloTriangleApplication::createLogicalDevice() {
 // Checks if the given physical device meets the requirements.
 bool HelloTriangleApplication::isDeviceSuitable(VkPhysicalDevice device) {
     QueueFamilyIndices indices = findQueueFamilies(device);
-    return indices.isComplete();
+    bool extensionsSupported = checkDeviceExtensionSupport(device);
+    return indices.isComplete() && extensionsSupported;
+}
+
+// Checks if the given physical device support 
+bool HelloTriangleApplication::checkDeviceExtensionSupport(VkPhysicalDevice device) {
+    uint32_t extensionCount;
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+
+    std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
+
+    std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+
+    for (const auto& extension : availableExtensions) {
+        requiredExtensions.erase(extension.extensionName);
+    }
+
+    return requiredExtensions.empty();
 }
 
 // Finds queue families that support required operations.

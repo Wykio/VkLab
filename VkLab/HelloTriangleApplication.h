@@ -29,6 +29,7 @@ private:
     std::vector<const char*> getRequiredExtensions();
     bool checkValidationLayerSupport();
     bool isDeviceSuitable(VkPhysicalDevice device);
+    bool checkDeviceExtensionSupport(VkPhysicalDevice device);
     struct QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
     // Vulkan resources
