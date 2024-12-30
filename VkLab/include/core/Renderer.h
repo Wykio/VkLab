@@ -1,5 +1,7 @@
-#ifndef HELLO_TRIANGLE_APPLICATION_H
-#define HELLO_TRIANGLE_APPLICATION_H
+#ifndef RENDERER_H
+#define RENDERER_H
+
+#include "core/VulkanInstance.h"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -9,7 +11,7 @@
 #include <optional>
 #include <set>
 
-class HelloTriangleApplication {
+class Renderer {
 public:
     void run();
 
@@ -20,14 +22,14 @@ private:
     void cleanup();
 
     // Vulkan-specific methods
-    void createInstance();
-    void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
+    //void createInstance();
+    //void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
     void setupDebugMessenger();
     void createSurface();
     void pickPhysicalDevice();
     void createLogicalDevice();
-    std::vector<const char*> getRequiredExtensions();
-    bool checkValidationLayerSupport();
+    //std::vector<const char*> getRequiredExtensions();
+    //bool checkValidationLayerSupport();
     bool isDeviceSuitable(VkPhysicalDevice device);
     bool checkDeviceExtensionSupport(VkPhysicalDevice device);
     struct QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
@@ -35,7 +37,8 @@ private:
     // Vulkan resources
     GLFWwindow* window;
 
-    VkInstance instance;
+    VulkanInstance r_instance;
+
     VkDebugUtilsMessengerEXT debugMessenger;
     VkSurfaceKHR surface;
 
@@ -46,4 +49,4 @@ private:
     VkQueue presentQueue;
 };
 
-#endif // HELLO_TRIANGLE_APPLICATION_H
+#endif // RENDERER_H

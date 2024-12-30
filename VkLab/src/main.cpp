@@ -1,10 +1,10 @@
-#include "HelloTriangleApplication.h"
+#include "core/Renderer.h"
 
 int main() {
-    HelloTriangleApplication app;
+    Renderer renderer;
 
     try {
-        app.run();
+        renderer.run();
     }
     catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
