@@ -1,7 +1,4 @@
 #include "core/VulkanInstance.h"
-#include "utils/Debug.h"
-
-#include <iostream>
 
 VulkanInstance::VulkanInstance() : instance(VK_NULL_HANDLE) {}
 

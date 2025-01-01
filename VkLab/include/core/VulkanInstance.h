@@ -1,7 +1,13 @@
 #ifndef INSTANCE_H
 #define INSTANCE_H
 
-#include "utils/Debug.h"
+#ifdef NDEBUG
+const bool enableValidationLayers = false;
+#else
+const bool enableValidationLayers = true;
+#endif
+
+#include "utils/DebugMessenger.h"
 
 #include <GLFW/glfw3.h>
 #include <vector>
@@ -17,11 +23,11 @@ public:
     VkInstance getInstance() const; // read only once created
 
 private:
-    VkInstance instance;
-    std::vector<const char*> requiredExtensions;
-
     bool checkValidationLayerSupport();
     std::vector<const char*> getRequiredExtensions();
+
+    VkInstance instance;
+    std::vector<const char*> requiredExtensions;
 };
 
 #endif // INSTANCE_H

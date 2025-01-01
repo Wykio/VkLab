@@ -1,7 +1,22 @@
-#include "utils/Debug.h"
+#include "utils/DebugMessenger.h"
+
+DebugMessenger::DebugMessenger() : debugMessenger(VK_NULL_HANDLE) {}
+
+void DebugMessenger::initialize(VkInstance instance) {
+    VkDebugUtilsMessengerCreateInfoEXT createInfo;
+    populateDebugMessengerCreateInfo(createInfo);
+
+    if (createDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS) {
+        throw std::runtime_error("failed to set up debug messenger!");
+    }
+}
+
+void DebugMessenger::cleanup(VkInstance instance) {
+    destroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
+}
 
 // This function creates a Vulkan debug messenger if the extension is available.
-VkResult CreateDebugUtilsMessengerEXT(
+VkResult DebugMessenger::createDebugUtilsMessengerEXT(
     VkInstance instance,
     const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
     const VkAllocationCallbacks* pAllocator,
@@ -16,7 +31,7 @@ VkResult CreateDebugUtilsMessengerEXT(
 }
 
 // This function destroys the Vulkan debug messenger.
-void DestroyDebugUtilsMessengerEXT(
+void DebugMessenger::destroyDebugUtilsMessengerEXT(
     VkInstance instance,
     VkDebugUtilsMessengerEXT debugMessenger,
     const VkAllocationCallbacks* pAllocator) {

@@ -19,13 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\core\Device.h" />
     <ClInclude Include="include\core\VulkanInstance.h" />
-    <ClInclude Include="include\utils\Debug.h" />
+    <ClInclude Include="include\utils\DebugMessenger.h" />
     <ClInclude Include="include\core\Renderer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\core\Device.cpp" />
     <ClCompile Include="src\core\VulkanInstance.cpp" />
-    <ClCompile Include="src\utils\Debug.cpp" />
+    <ClCompile Include="src\utils\DebugMessenger.cpp" />
     <ClCompile Include="src\core\Renderer.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>

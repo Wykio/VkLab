@@ -2,6 +2,7 @@
 #define RENDERER_H
 
 #include "core/VulkanInstance.h"
+#include "core/Device.h"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -22,31 +23,20 @@ private:
     void cleanup();
 
     // Vulkan-specific methods
-    //void createInstance();
-    //void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
-    void setupDebugMessenger();
     void createSurface();
-    void pickPhysicalDevice();
-    void createLogicalDevice();
-    //std::vector<const char*> getRequiredExtensions();
-    //bool checkValidationLayerSupport();
-    bool isDeviceSuitable(VkPhysicalDevice device);
-    bool checkDeviceExtensionSupport(VkPhysicalDevice device);
-    struct QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
     // Vulkan resources
     GLFWwindow* window;
 
     VulkanInstance r_instance;
 
-    VkDebugUtilsMessengerEXT debugMessenger;
-    VkSurfaceKHR surface;
+    DebugMessenger r_debugMessenger;
+    VkSurfaceKHR surface = VK_NULL_HANDLE;
 
-    VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-    VkDevice device;
+    Device r_device;
 
-    VkQueue graphicsQueue;
-    VkQueue presentQueue;
+    VkQueue graphicsQueue = VK_NULL_HANDLE;
+    VkQueue presentQueue = VK_NULL_HANDLE;
 };
 
 #endif // RENDERER_H
