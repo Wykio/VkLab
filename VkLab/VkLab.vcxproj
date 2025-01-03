@@ -20,12 +20,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\core\Device.h" />
+    <ClInclude Include="include\core\Swapchain.h" />
     <ClInclude Include="include\core\VulkanInstance.h" />
     <ClInclude Include="include\utils\DebugMessenger.h" />
     <ClInclude Include="include\core\Renderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\core\Device.cpp" />
+    <ClCompile Include="src\core\Swapchain.cpp" />
     <ClCompile Include="src\core\VulkanInstance.cpp" />
     <ClCompile Include="src\utils\DebugMessenger.cpp" />
     <ClCompile Include="src\core\Renderer.cpp" />

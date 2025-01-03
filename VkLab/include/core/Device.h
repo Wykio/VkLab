@@ -22,6 +22,13 @@ struct QueueFamilyIndices {
 	}
 };
 
+struct SwapChainSupportDetails {
+	VkSurfaceCapabilitiesKHR capabilities;
+	std::vector<VkSurfaceFormatKHR> formats;
+	std::vector<VkPresentModeKHR> presentModes;
+};
+
+
 class Device {
 public:
 	Device();
@@ -30,6 +37,8 @@ public:
 	void cleanup();
 	void pickPhysicalDevice(VkInstance instance);
 	void createLogicalDevice(VkQueue* graphicsQueue, VkQueue* presentQueue);
+	VkPhysicalDevice getPhysicalDevice();
+	VkDevice getLogicalDevice();
 
 private:
 	VkPhysicalDevice physicalDevice;
@@ -37,8 +46,10 @@ private:
 	VkSurfaceKHR *psurface;
 };
 
+// Device selection functions
 bool isDeviceSuitable(VkPhysicalDevice physicalDevice, VkSurfaceKHR* psurface);
 QueueFamilyIndices findQueueFamilies(VkPhysicalDevice physicalDevice, VkSurfaceKHR* psurface);
 bool checkDeviceExtensionSupport(VkPhysicalDevice physicalDevice);
+SwapChainSupportDetails querySwapChainSupport(const VkPhysicalDevice device, const VkSurfaceKHR* psurface);
 
 #endif // DEVICE_H

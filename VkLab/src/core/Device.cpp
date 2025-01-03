@@ -80,7 +80,8 @@ void Device::createLogicalDevice(VkQueue* graphicsQueue, VkQueue* presentQueue) 
 
     createInfo.pEnabledFeatures = &deviceFeatures;
 
-    createInfo.enabledExtensionCount = 0;
+    createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
+    createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
     if (enableValidationLayers) {
         createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
@@ -99,11 +100,28 @@ void Device::createLogicalDevice(VkQueue* graphicsQueue, VkQueue* presentQueue) 
     vkGetDeviceQueue(device, indices.presentFamily.value(), 0, presentQueue);
 }
 
+VkPhysicalDevice Device::getPhysicalDevice() {
+    return physicalDevice;
+}
+
+VkDevice Device::getLogicalDevice() {
+    return device;
+}
+
 // Checks if the given physical device meets the requirements.
 bool isDeviceSuitable(VkPhysicalDevice physicalDevice, VkSurfaceKHR* psurface) {
     QueueFamilyIndices indices = findQueueFamilies(physicalDevice, psurface);
+
     bool extensionsSupported = checkDeviceExtensionSupport(physicalDevice);
-    return indices.isComplete() && extensionsSupported;
+
+
+    bool swapChainAdequate = false;
+    if (extensionsSupported) {
+        SwapChainSupportDetails swapChainSupport = querySwapChainSupport(physicalDevice, psurface);
+        swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
+    }
+
+    return indices.isComplete() && extensionsSupported && swapChainAdequate;
 }
 
 // Finds queue families that support required operations.
@@ -138,7 +156,7 @@ QueueFamilyIndices findQueueFamilies(VkPhysicalDevice physicalDevice, VkSurfaceK
     return indices;
 }
 
-// Checks if the given physical device support 
+// Checks if the given physical device supports necessary extensions
 bool checkDeviceExtensionSupport(VkPhysicalDevice physicalDevice) {
     uint32_t extensionCount;
     vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, nullptr);
@@ -153,4 +171,29 @@ bool checkDeviceExtensionSupport(VkPhysicalDevice physicalDevice) {
     }
 
     return requiredExtensions.empty();
+}
+
+// Checks physical device and surface support capabilities
+SwapChainSupportDetails querySwapChainSupport(const VkPhysicalDevice device, const VkSurfaceKHR* psurface) {
+    SwapChainSupportDetails details;
+
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, *psurface, &details.capabilities);
+
+    uint32_t formatCount;
+    vkGetPhysicalDeviceSurfaceFormatsKHR(device, *psurface, &formatCount, nullptr);
+
+    if (formatCount != 0) {
+        details.formats.resize(formatCount);
+        vkGetPhysicalDeviceSurfaceFormatsKHR(device, *psurface, &formatCount, details.formats.data());
+    }
+
+    uint32_t presentModeCount;
+    vkGetPhysicalDeviceSurfacePresentModesKHR(device, *psurface, &presentModeCount, nullptr);
+
+    if (presentModeCount != 0) {
+        details.presentModes.resize(presentModeCount);
+        vkGetPhysicalDeviceSurfacePresentModesKHR(device, *psurface, &presentModeCount, details.presentModes.data());
+    }
+
+    return details;
 }

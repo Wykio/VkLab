@@ -3,6 +3,7 @@
 
 #include "core/VulkanInstance.h"
 #include "core/Device.h"
+#include "core/Swapchain.h"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -37,6 +38,8 @@ private:
 
     VkQueue graphicsQueue = VK_NULL_HANDLE;
     VkQueue presentQueue = VK_NULL_HANDLE;
+
+    Swapchain r_swapchain;
 };
 
 #endif // RENDERER_H

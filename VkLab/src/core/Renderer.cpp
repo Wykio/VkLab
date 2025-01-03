@@ -31,6 +31,8 @@ void Renderer::initVulkan() {
     createSurface();
 
     r_device.initialize(r_instance.getInstance(), &surface, &graphicsQueue, &presentQueue);
+
+    r_swapchain.initialize(&r_device, &surface, window);
 }
 
 // Runs the main event loop of the application.
@@ -42,8 +44,9 @@ void Renderer::mainLoop() {
 
 // Cleans up all Vulkan and GLFW resources.
 void Renderer::cleanup() {
+    r_swapchain.cleanup(&r_device);
+
     r_device.cleanup();
-    //vkDestroyDevice(device, nullptr);
 
     if (enableValidationLayers) {
         r_debugMessenger.cleanup(r_instance.getInstance());
