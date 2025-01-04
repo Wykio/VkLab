@@ -33,6 +33,8 @@ void Renderer::initVulkan() {
     r_device.initialize(r_instance.getInstance(), &surface, &graphicsQueue, &presentQueue);
 
     r_swapchain.initialize(&r_device, &surface, window);
+
+    r_imageviews.initialize(&r_device, &r_swapchain);
 }
 
 // Runs the main event loop of the application.
@@ -44,6 +46,8 @@ void Renderer::mainLoop() {
 
 // Cleans up all Vulkan and GLFW resources.
 void Renderer::cleanup() {
+    r_imageviews.cleanup(&r_device);
+
     r_swapchain.cleanup(&r_device);
 
     r_device.cleanup();

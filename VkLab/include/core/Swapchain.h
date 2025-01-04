@@ -14,7 +14,9 @@ class Swapchain
 public:
 	void initialize(Device* device, VkSurfaceKHR* psurface, GLFWwindow* window);
 	void cleanup(Device* device);
-
+	const std::vector<VkImage> getSwapChainImages();
+	const VkFormat getSwapChainImageFormat();
+	
 private:
 	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);

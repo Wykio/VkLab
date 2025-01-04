@@ -4,6 +4,7 @@
 #include "core/VulkanInstance.h"
 #include "core/Device.h"
 #include "core/Swapchain.h"
+#include "core/ImageViews.h"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -40,6 +41,8 @@ private:
     VkQueue presentQueue = VK_NULL_HANDLE;
 
     Swapchain r_swapchain;
+
+    ImageViews r_imageviews;
 };
 
 #endif // RENDERER_H
