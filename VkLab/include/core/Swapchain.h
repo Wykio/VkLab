@@ -9,7 +9,7 @@
 #include <algorithm> // Necessary for std::clamp
 
 
-class Swapchain
+class SwapChain
 {
 public:
 	void initialize(Device* device, VkSurfaceKHR* psurface, GLFWwindow* window);
@@ -28,4 +28,4 @@ private:
 	VkExtent2D swapChainExtent;
 };
 
-#endif
+#endif // SWAPCHAIN_H

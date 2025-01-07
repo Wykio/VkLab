@@ -28,7 +28,6 @@ struct SwapChainSupportDetails {
 	std::vector<VkPresentModeKHR> presentModes;
 };
 
-
 class Device {
 public:
 	Device();

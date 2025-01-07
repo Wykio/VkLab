@@ -1,6 +1,6 @@
 #include "core/ImageViews.h"
 
-void ImageViews::initialize(Device* device, Swapchain* swapchain) {
+void ImageViews::initialize(Device* device, SwapChain* swapchain) {
 	std::vector<VkImage> swapchainImages = swapchain->getSwapChainImages();
 
 	swapChainImageViews.resize(swapchainImages.size());

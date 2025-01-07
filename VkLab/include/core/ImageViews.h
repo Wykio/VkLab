@@ -11,7 +11,7 @@
 class ImageViews
 {
 public:
-	void initialize(Device* device, Swapchain* swapchain);
+	void initialize(Device* device, SwapChain* swapchain);
 	void cleanup(Device* device);
 
 private:

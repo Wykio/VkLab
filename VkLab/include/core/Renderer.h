@@ -5,6 +5,7 @@
 #include "core/Device.h"
 #include "core/Swapchain.h"
 #include "core/ImageViews.h"
+#include "core/Pipeline.h"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -40,9 +41,11 @@ private:
     VkQueue graphicsQueue = VK_NULL_HANDLE;
     VkQueue presentQueue = VK_NULL_HANDLE;
 
-    Swapchain r_swapchain;
+    SwapChain r_swapchain;
 
     ImageViews r_imageviews;
+
+    Pipeline r_pipeline;
 };
 
 #endif // RENDERER_H

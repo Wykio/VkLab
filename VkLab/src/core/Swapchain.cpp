@@ -1,6 +1,6 @@
-#include "core/Swapchain.h"
+#include "core/SwapChain.h"
 
-void Swapchain::initialize(Device* device, VkSurfaceKHR* psurface, GLFWwindow* window) {
+void SwapChain::initialize(Device* device, VkSurfaceKHR* psurface, GLFWwindow* window) {
     VkPhysicalDevice physicalDevice = device->getPhysicalDevice();
     VkDevice logicalDevice = device->getLogicalDevice();
 
@@ -55,22 +55,22 @@ void Swapchain::initialize(Device* device, VkSurfaceKHR* psurface, GLFWwindow* w
     }
 }
 
-void Swapchain::cleanup(Device* device) {
+void SwapChain::cleanup(Device* device) {
     if (swapChain != VK_NULL_HANDLE) {
         vkDestroySwapchainKHR(device->getLogicalDevice(), swapChain, nullptr);
     }
 }
 
-const std::vector<VkImage> Swapchain::getSwapChainImages() {
+const std::vector<VkImage> SwapChain::getSwapChainImages() {
     return swapChainImages;
 }
 
-const VkFormat Swapchain::getSwapChainImageFormat() {
+const VkFormat SwapChain::getSwapChainImageFormat() {
     return swapChainImageFormat;
 }
 
 // Select VK_FORMAT_B8G8R8A8_SRGB format and VK_COLOR_SPACE_SRGB_NONLINEAR_KHR if available
-VkSurfaceFormatKHR Swapchain::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
+VkSurfaceFormatKHR SwapChain::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
     for (const auto& availableFormat : availableFormats) {
         if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
             return availableFormat;
@@ -81,7 +81,7 @@ VkSurfaceFormatKHR Swapchain::chooseSwapSurfaceFormat(const std::vector<VkSurfac
 }
 
 // Select VK_PRESENT_MODE_MAILBOX_KHR if available 
-VkPresentModeKHR Swapchain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
+VkPresentModeKHR SwapChain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
     for (const auto& availablePresentMode : availablePresentModes) {
         if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
             return availablePresentMode;
@@ -92,7 +92,7 @@ VkPresentModeKHR Swapchain::chooseSwapPresentMode(const std::vector<VkPresentMod
 }
 
 // Choose the resolution of the swap chain images
-VkExtent2D Swapchain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window) {
+VkExtent2D SwapChain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window) {
     if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
         return capabilities.currentExtent;
     }
