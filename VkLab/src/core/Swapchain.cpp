@@ -1,8 +1,8 @@
 #include "core/SwapChain.h"
 
-void SwapChain::initialize(Device* device, VkSurfaceKHR* psurface, GLFWwindow* window) {
-    VkPhysicalDevice physicalDevice = device->getPhysicalDevice();
-    VkDevice logicalDevice = device->getLogicalDevice();
+void SwapChain::initialize(Device* pdevice, VkSurfaceKHR* psurface, GLFWwindow* window) {
+    VkPhysicalDevice physicalDevice = pdevice->getPhysicalDevice();
+    VkDevice logicalDevice = pdevice->getLogicalDevice();
 
     SwapChainSupportDetails swapChainSupport = querySwapChainSupport(physicalDevice, psurface);
 
@@ -53,6 +53,14 @@ void SwapChain::initialize(Device* device, VkSurfaceKHR* psurface, GLFWwindow* w
     if (vkCreateSwapchainKHR(logicalDevice, &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
         throw std::runtime_error("failed to create swap chain!");
     }
+
+    // Remember that we only specified a minimum number of images in the swap chain, so the implementation is allowed to create a swap chain with more.
+    vkGetSwapchainImagesKHR(logicalDevice, swapChain, &imageCount, nullptr); 
+    swapChainImages.resize(imageCount); // That’s why resize the container first
+    vkGetSwapchainImagesKHR(logicalDevice, swapChain, &imageCount, swapChainImages.data());
+
+    swapChainImageFormat = surfaceFormat.format;
+    swapChainExtent = extent;
 }
 
 void SwapChain::cleanup(Device* device) {

@@ -6,6 +6,7 @@
 #include "core/Swapchain.h"
 #include "core/ImageViews.h"
 #include "core/Pipeline.h"
+#include "graphics/RenderPass.h"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -46,6 +47,8 @@ private:
     ImageViews r_imageviews;
 
     Pipeline r_pipeline;
+
+    RenderPass r_renderpass;
 };
 
 #endif // RENDERER_H

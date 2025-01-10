@@ -36,6 +36,8 @@ void Renderer::initVulkan() {
 
     r_imageviews.initialize(&r_device, &r_swapchain);
 
+    r_renderpass.initialize(&r_device, &r_swapchain);
+
     r_pipeline.initialize(&r_device);
 }
 
@@ -49,6 +51,8 @@ void Renderer::mainLoop() {
 // Cleans up all Vulkan and GLFW resources.
 void Renderer::cleanup() {
     r_pipeline.cleanup(&r_device);
+
+    r_renderpass.cleanup(&r_device);
 
     r_imageviews.cleanup(&r_device);
 
