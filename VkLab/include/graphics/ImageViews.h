@@ -1,7 +1,7 @@
 #ifndef IMAGE_VIEWS_H
 #define IMAGE_VIEWS_H
 
-#include "core/Swapchain.h"
+#include "graphics/Swapchain.h"
 
 #include <vulkan/vulkan.h>
 #include <vector>
@@ -13,6 +13,7 @@ class ImageViews
 public:
 	void initialize(Device* device, SwapChain* swapchain);
 	void cleanup(Device* device);
+	std::vector<VkImageView> getSwapChainImageViews();
 
 private:
 	std::vector<VkImageView> swapChainImageViews;

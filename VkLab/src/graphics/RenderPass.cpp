@@ -41,3 +41,7 @@ void RenderPass::initialize(Device* pdevice, SwapChain* pswapchain) {
 void RenderPass::cleanup(Device* pdevice) {
 	vkDestroyRenderPass(pdevice->getLogicalDevice(), renderPass, nullptr);
 }
+
+VkRenderPass RenderPass::getRenderPass() {
+	return renderPass;
+}

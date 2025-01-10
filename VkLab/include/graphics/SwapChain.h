@@ -1,7 +1,7 @@
 #ifndef SWAPCHAIN_H
 #define SWAPCHAIN_H
 
-#include "Device.h"
+#include "core/Device.h"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -16,6 +16,7 @@ public:
 	void cleanup(Device* device);
 	const std::vector<VkImage> getSwapChainImages();
 	const VkFormat getSwapChainImageFormat();
+	const VkExtent2D getSwapChainExtent();
 	
 private:
 	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);

@@ -1,4 +1,4 @@
-#include "core/ImageViews.h"
+#include "graphics/ImageViews.h"
 
 void ImageViews::initialize(Device* device, SwapChain* swapchain) {
 	std::vector<VkImage> swapchainImages = swapchain->getSwapChainImages();
@@ -35,4 +35,8 @@ void ImageViews::cleanup(Device* device) {
 	for (auto imageView : swapChainImageViews) {
 		vkDestroyImageView(logicalDevice, imageView, nullptr);
 	}
+}
+
+std::vector<VkImageView> ImageViews::getSwapChainImageViews() {
+	return swapChainImageViews;
 }

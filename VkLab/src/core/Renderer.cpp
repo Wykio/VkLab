@@ -31,14 +31,12 @@ void Renderer::initVulkan() {
     createSurface();
 
     r_device.initialize(r_instance.getInstance(), &surface, &graphicsQueue, &presentQueue);
-
     r_swapchain.initialize(&r_device, &surface, window);
-
     r_imageviews.initialize(&r_device, &r_swapchain);
-
     r_renderpass.initialize(&r_device, &r_swapchain);
-
-    r_pipeline.initialize(&r_device);
+    r_pipeline.initialize(&r_device, &r_renderpass);
+    r_framebuffer.initialize(&r_device, &r_swapchain, &r_imageviews, &r_renderpass);
+    r_commandpool.initialize(&r_device, &surface);
 }
 
 // Runs the main event loop of the application.
@@ -50,14 +48,12 @@ void Renderer::mainLoop() {
 
 // Cleans up all Vulkan and GLFW resources.
 void Renderer::cleanup() {
+    r_commandpool.cleanup(&r_device);
+    r_framebuffer.cleanup(&r_device);
     r_pipeline.cleanup(&r_device);
-
     r_renderpass.cleanup(&r_device);
-
     r_imageviews.cleanup(&r_device);
-
     r_swapchain.cleanup(&r_device);
-
     r_device.cleanup();
 
     if (enableValidationLayers) {

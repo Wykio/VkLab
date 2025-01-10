@@ -3,10 +3,12 @@
 
 #include "core/VulkanInstance.h"
 #include "core/Device.h"
-#include "core/Swapchain.h"
-#include "core/ImageViews.h"
-#include "core/Pipeline.h"
+#include "graphics/Swapchain.h"
+#include "graphics/ImageViews.h"
+#include "graphics/Pipeline.h"
 #include "graphics/RenderPass.h"
+#include "graphics/FrameBuffer.h"
+#include "graphics/CommandPool.h"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -49,6 +51,10 @@ private:
     Pipeline r_pipeline;
 
     RenderPass r_renderpass;
+
+    FrameBuffer r_framebuffer;
+
+    CommandPool r_commandpool;
 };
 
 #endif // RENDERER_H

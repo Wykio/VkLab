@@ -1,4 +1,4 @@
-#include "core/SwapChain.h"
+#include "graphics/SwapChain.h"
 
 void SwapChain::initialize(Device* pdevice, VkSurfaceKHR* psurface, GLFWwindow* window) {
     VkPhysicalDevice physicalDevice = pdevice->getPhysicalDevice();
@@ -75,6 +75,10 @@ const std::vector<VkImage> SwapChain::getSwapChainImages() {
 
 const VkFormat SwapChain::getSwapChainImageFormat() {
     return swapChainImageFormat;
+}
+
+const VkExtent2D SwapChain::getSwapChainExtent() {
+    return swapChainExtent;
 }
 
 // Select VK_FORMAT_B8G8R8A8_SRGB format and VK_COLOR_SPACE_SRGB_NONLINEAR_KHR if available

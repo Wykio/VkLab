@@ -1,6 +1,6 @@
-#include "core/Pipeline.h"
+#include "graphics/Pipeline.h"
 
-void Pipeline::initialize(Device* pdevice) {
+void Pipeline::initialize(Device* pdevice, RenderPass* prenderpass) {
     VkDevice logicalDevice = pdevice->getLogicalDevice();
 
 	auto vertShaderCode = readFile("shaders/vert.spv");
@@ -118,12 +118,45 @@ void Pipeline::initialize(Device* pdevice) {
         throw std::runtime_error("failed to create pipeline layout!");
     }
 
+    // Build the complete pipeline
+    VkGraphicsPipelineCreateInfo pipelineInfo{};
+    pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    pipelineInfo.stageCount = 2; // vertex shader + fragment shader
+    pipelineInfo.pStages = shaderStages;
+
+    // Reference all of the structures describing the fixed-function stage
+    pipelineInfo.pVertexInputState = &vertexInputInfo;
+    pipelineInfo.pInputAssemblyState = &inputAssembly;
+    pipelineInfo.pViewportState = &viewportState;
+    pipelineInfo.pRasterizationState = &rasterizer;
+    pipelineInfo.pMultisampleState = &multisampling;
+    pipelineInfo.pDepthStencilState = nullptr; // Optional
+    pipelineInfo.pColorBlendState = &colorBlending;
+    pipelineInfo.pDynamicState = &dynamicState;
+
+    pipelineInfo.layout = pipelineLayout;
+
+    pipelineInfo.renderPass = prenderpass->getRenderPass(); // Reference to the render pass and the index of the sub pass
+    pipelineInfo.subpass = 0;
+
+    pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional Vulkan allows you to create a new graphics pipeline by deriving from an existing pipeline.
+    pipelineInfo.basePipelineIndex = -1; // Optional
+
+    if (vkCreateGraphicsPipelines(logicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create graphics pipeline!");
+    }
+
     vkDestroyShaderModule(logicalDevice, fragShaderModule, nullptr);
     vkDestroyShaderModule(logicalDevice, vertShaderModule, nullptr);
 }
 
 void Pipeline::cleanup(Device* pdevice) {
+    VkDevice logicalDevice = pdevice->getLogicalDevice();
+
+    if (graphicsPipeline != VK_NULL_HANDLE) {
+        vkDestroyPipeline(logicalDevice, graphicsPipeline, nullptr);
+    }
     if (pipelineLayout != VK_NULL_HANDLE) {
-        vkDestroyPipelineLayout(pdevice->getLogicalDevice(), pipelineLayout, nullptr);
+        vkDestroyPipelineLayout(logicalDevice, pipelineLayout, nullptr);
     }
 }
