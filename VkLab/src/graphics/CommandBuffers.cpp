@@ -1,20 +1,34 @@
-#include "graphics/CommandBuffer.h"
+#include "graphics/CommandBuffers.h"
 
 
-void CommandBuffer::initialize(Device* pdevice, CommandPool* pCommandPool) {
+void CommandBuffers::initialize(Device* pdevice, CommandPool* pCommandPool) {
+    commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.commandPool = pCommandPool->getCommandPool();
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY; // Can be submitted to a queue for execution, but cannot be called from other command buffers.
-    allocInfo.commandBufferCount = 1;
+    allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
 
-    if (vkAllocateCommandBuffers(pdevice->getLogicalDevice(), &allocInfo, &commandBuffer) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(pdevice->getLogicalDevice(), &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate command buffers!");
     }
 }
 
-// We pass the index of the current swapchain image we want to write to
-void CommandBuffer::recordCommandBuffer(uint32_t imageIndex, SwapChain* pSwapChain, RenderPass* pRenderPass, Pipeline* pPipeline, FrameBuffer* pFrameBuffer) {
+std::vector<VkCommandBuffer> CommandBuffers::getCommandBuffers() {
+    return commandBuffers;
+}
+
+VkCommandBuffer CommandBuffers::getCommandBuffer(const int index) {
+    return commandBuffers[index];
+}
+
+VkCommandBuffer* CommandBuffers::getCommandBufferPtr(const int index) {
+    return &commandBuffers[index];
+}
+
+// We pass the command buffer and the index of the current swapchain image we want to write to
+void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex, SwapChain* pSwapChain, RenderPass* pRenderPass, Pipeline* pPipeline, FrameBuffer* pFrameBuffer) {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -58,12 +72,4 @@ void CommandBuffer::recordCommandBuffer(uint32_t imageIndex, SwapChain* pSwapCha
     if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
-}
-
-VkCommandBuffer CommandBuffer::getCommandBuffer() {
-    return commandBuffer;
-}
-
-VkCommandBuffer* CommandBuffer::getCommandBufferPtr() {
-    return &commandBuffer;
 }

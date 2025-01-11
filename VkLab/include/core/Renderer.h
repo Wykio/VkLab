@@ -1,6 +1,7 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include "core/Constant.h"
 #include "core/VulkanInstance.h"
 #include "core/Device.h"
 #include "graphics/Swapchain.h"
@@ -9,7 +10,7 @@
 #include "graphics/RenderPass.h"
 #include "graphics/FrameBuffer.h"
 #include "graphics/CommandPool.h"
-#include "graphics/CommandBuffer.h"
+#include "graphics/CommandBuffers.h"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -53,11 +54,14 @@ private:
     RenderPass r_renderpass;
     FrameBuffer r_framebuffer;
     CommandPool r_commandpool;
-    CommandBuffer r_commandbuffer;
 
-    VkSemaphore imageAvailableSemaphore;
-    VkSemaphore renderFinishedSemaphore;
-    VkFence inFlightFence;
+    CommandBuffers r_commandbuffers;
+
+    std::vector<VkSemaphore> imageAvailableSemaphores;
+    std::vector<VkSemaphore> renderFinishedSemaphores;
+    std::vector<VkFence> inFlightFences;
+
+    uint32_t currentFrame = 0;
 };
 
 #endif // RENDERER_H

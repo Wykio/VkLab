@@ -19,8 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\core\Constant.h" />
     <ClInclude Include="include\core\Device.h" />
-    <ClInclude Include="include\graphics\CommandBuffer.h" />
+    <ClInclude Include="include\graphics\CommandBuffers.h" />
     <ClInclude Include="include\graphics\CommandPool.h" />
     <ClInclude Include="include\graphics\ImageViews.h" />
     <ClInclude Include="include\graphics\Pipeline.h" />
@@ -34,7 +35,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\core\Device.cpp" />
-    <ClCompile Include="src\graphics\CommandBuffer.cpp" />
+    <ClCompile Include="src\graphics\CommandBuffers.cpp" />
     <ClCompile Include="src\graphics\CommandPool.cpp" />
     <ClCompile Include="src\graphics\FrameBuffer.cpp" />
     <ClCompile Include="src\graphics\ImageViews.cpp" />

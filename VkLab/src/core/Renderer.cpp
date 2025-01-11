@@ -1,8 +1,5 @@
 #include "Core/Renderer.h"
 
-const uint32_t WIDTH = 800;
-const uint32_t HEIGHT = 600;
-
 void Renderer::run() {
     initWindow();
     initVulkan();
@@ -37,7 +34,7 @@ void Renderer::initVulkan() {
     r_pipeline.initialize(&r_device, &r_renderpass);
     r_framebuffer.initialize(&r_device, &r_swapchain, &r_imageviews, &r_renderpass);
     r_commandpool.initialize(&r_device, &surface);
-    r_commandbuffer.initialize(&r_device, &r_commandpool);
+    r_commandbuffers.initialize(&r_device, &r_commandpool);
 
     createSyncObjects();
 }
@@ -55,9 +52,11 @@ void Renderer::mainLoop() {
 
 // Cleans up all Vulkan and GLFW resources.
 void Renderer::cleanup() {
-    vkDestroySemaphore(r_device.getLogicalDevice(), imageAvailableSemaphore, nullptr);
-    vkDestroySemaphore(r_device.getLogicalDevice(), renderFinishedSemaphore, nullptr);
-    vkDestroyFence(r_device.getLogicalDevice(), inFlightFence, nullptr);
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        vkDestroySemaphore(r_device.getLogicalDevice(), renderFinishedSemaphores[i], nullptr);
+        vkDestroySemaphore(r_device.getLogicalDevice(), imageAvailableSemaphores[i], nullptr);
+        vkDestroyFence(r_device.getLogicalDevice(), inFlightFences[i], nullptr);
+    }
 
     r_commandpool.cleanup(&r_device);
     r_framebuffer.cleanup(&r_device);
@@ -107,21 +106,20 @@ void Renderer::drawFrame() {
     // the command buffer while the GPU is using it.
 
     // - Wait for the previous frame to finish
-    vkWaitForFences(r_device.getLogicalDevice(), 1, &inFlightFence, VK_TRUE, UINT64_MAX);
-    vkResetFences(r_device.getLogicalDevice(), 1, &inFlightFence);
+    vkWaitForFences(r_device.getLogicalDevice(), 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
+    vkResetFences(r_device.getLogicalDevice(), 1, &inFlightFences[currentFrame]);
     
     uint32_t imageIndex;
     // Recall that the swap chain is an extension feature, so we must use a function with the vk*KHR naming convention
-    vkAcquireNextImageKHR(r_device.getLogicalDevice(), r_swapchain.getSwapChain(), UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+    vkAcquireNextImageKHR(r_device.getLogicalDevice(), r_swapchain.getSwapChain(), UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
 
-    vkResetCommandBuffer(r_commandbuffer.getCommandBuffer(), /*VkCommandBufferResetFlagBits*/ 0);
-    // Record the commands we want.
-    r_commandbuffer.recordCommandBuffer(imageIndex, &r_swapchain, &r_renderpass, &r_pipeline, &r_framebuffer);
+    vkResetCommandBuffer(r_commandbuffers.getCommandBuffer(currentFrame), /*VkCommandBufferResetFlagBits*/ 0);
+    recordCommandBuffer(r_commandbuffers.getCommandBuffer(currentFrame), imageIndex, &r_swapchain, &r_renderpass, &r_pipeline, &r_framebuffer);
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-    VkSemaphore waitSemaphores[] = { imageAvailableSemaphore }; // We want to wait with writing colors to the image until it’s available
+    VkSemaphore waitSemaphores[] = { imageAvailableSemaphores[currentFrame] }; // We want to wait with writing colors to the image until it’s available
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT }; // so we’re specifying the stage of the graphics pipeline that writes to the color attachment
     
     submitInfo.waitSemaphoreCount = 1;
@@ -129,13 +127,13 @@ void Renderer::drawFrame() {
     submitInfo.pWaitDstStageMask = waitStages;
 
     submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = r_commandbuffer.getCommandBufferPtr(); // Specify which command buffers to actually submit for execution
+    submitInfo.pCommandBuffers = r_commandbuffers.getCommandBufferPtr(currentFrame); // Specify which command buffers to actually submit for execution
 
-    VkSemaphore signalSemaphores[] = { renderFinishedSemaphore }; // Specify which command buffers to actually submit for execution
+    VkSemaphore signalSemaphores[] = { renderFinishedSemaphores[currentFrame]}; // Specify which command buffers to actually submit for execution
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores; // Specify which semaphores to signal once the command buffer(s) have finished execution
 
-    if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFence) != VK_SUCCESS) {
+    if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS) {
         throw std::runtime_error("failed to submit draw command buffer!");
     }
 
@@ -156,19 +154,30 @@ void Renderer::drawFrame() {
 
     // Submits the request to present an image to the swap chain.
     vkQueuePresentKHR(presentQueue, &presentInfo);
+
+    // advance to the next frame every time
+    currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT; // By using the modulo (%) operator, we ensure that the frame index loops around after every MAX_FRAMES_IN_FLIGHT enqueued frames.
 }
 
 void Renderer::createSyncObjects() {
+    imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+    renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+    inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
+
     VkSemaphoreCreateInfo semaphoreInfo{};
     semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
     VkFenceCreateInfo fenceInfo{};
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT; // To be signaled the first time we wait for it
+     
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        if (vkCreateSemaphore(r_device.getLogicalDevice(), &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
+            vkCreateSemaphore(r_device.getLogicalDevice(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
+            vkCreateFence(r_device.getLogicalDevice(), &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) {
 
-    if (vkCreateSemaphore(r_device.getLogicalDevice(), &semaphoreInfo, nullptr, &imageAvailableSemaphore) != VK_SUCCESS ||
-        vkCreateSemaphore(r_device.getLogicalDevice(), &semaphoreInfo, nullptr, &renderFinishedSemaphore) != VK_SUCCESS ||
-        vkCreateFence(r_device.getLogicalDevice(), &fenceInfo, nullptr, &inFlightFence) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create semaphores!");
+            throw std::runtime_error("failed to create synchronization objects for a frame!");
+        }
     }
+
 }
