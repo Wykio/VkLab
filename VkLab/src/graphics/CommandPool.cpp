@@ -16,3 +16,7 @@ void CommandPool::initialize(Device* pdevice, VkSurfaceKHR* psurface) {
 void CommandPool::cleanup(Device* pdevice) {
 	vkDestroyCommandPool(pdevice->getLogicalDevice(), commandPool, nullptr);
 }
+
+VkCommandPool CommandPool::getCommandPool() {
+	return commandPool;
+}

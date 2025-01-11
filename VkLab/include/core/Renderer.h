@@ -9,6 +9,7 @@
 #include "graphics/RenderPass.h"
 #include "graphics/FrameBuffer.h"
 #include "graphics/CommandPool.h"
+#include "graphics/CommandBuffer.h"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -30,6 +31,8 @@ private:
 
     // Vulkan-specific methods
     void createSurface();
+    void drawFrame();
+    void createSyncObjects();
 
     // Vulkan resources
     GLFWwindow* window;
@@ -45,16 +48,16 @@ private:
     VkQueue presentQueue = VK_NULL_HANDLE;
 
     SwapChain r_swapchain;
-
     ImageViews r_imageviews;
-
     Pipeline r_pipeline;
-
     RenderPass r_renderpass;
-
     FrameBuffer r_framebuffer;
-
     CommandPool r_commandpool;
+    CommandBuffer r_commandbuffer;
+
+    VkSemaphore imageAvailableSemaphore;
+    VkSemaphore renderFinishedSemaphore;
+    VkFence inFlightFence;
 };
 
 #endif // RENDERER_H

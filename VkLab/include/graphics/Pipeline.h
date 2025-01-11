@@ -12,6 +12,7 @@ class Pipeline
 public:
 	void initialize(Device* pdevice, RenderPass* prenderpass);
 	void cleanup(Device* pdevice);
+	VkPipeline getGraphicsPipeline();
 
 private:
 	VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;

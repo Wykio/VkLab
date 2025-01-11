@@ -160,3 +160,7 @@ void Pipeline::cleanup(Device* pdevice) {
         vkDestroyPipelineLayout(logicalDevice, pipelineLayout, nullptr);
     }
 }
+
+VkPipeline Pipeline::getGraphicsPipeline() {
+    return graphicsPipeline;
+}

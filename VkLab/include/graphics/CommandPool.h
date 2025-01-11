@@ -10,6 +10,7 @@ class CommandPool
 public:
 	void initialize(Device* pdevice, VkSurfaceKHR* psurface);
 	void cleanup(Device* pdevice);
+	VkCommandPool getCommandPool();
 
 private:
 	VkCommandPool commandPool;

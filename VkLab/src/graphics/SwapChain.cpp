@@ -69,6 +69,10 @@ void SwapChain::cleanup(Device* device) {
     }
 }
 
+const VkSwapchainKHR SwapChain::getSwapChain() {
+    return swapChain;
+}
+
 const std::vector<VkImage> SwapChain::getSwapChainImages() {
     return swapChainImages;
 }

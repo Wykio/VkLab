@@ -14,6 +14,7 @@ class SwapChain
 public:
 	void initialize(Device* device, VkSurfaceKHR* psurface, GLFWwindow* window);
 	void cleanup(Device* device);
+	const VkSwapchainKHR getSwapChain();
 	const std::vector<VkImage> getSwapChainImages();
 	const VkFormat getSwapChainImageFormat();
 	const VkExtent2D getSwapChainExtent();

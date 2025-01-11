@@ -26,12 +26,30 @@ void RenderPass::initialize(Device* pdevice, SwapChain* pswapchain) {
 	subpass.colorAttachmentCount = 1;
 	subpass.pColorAttachments = &colorAttachmentRef; // Directly referenced from the fragment shader with the layout(location = 0) out vec4 outColor directive
 
+	// Create Subpass dependencies for synchronization
+	VkSubpassDependency dependency{};
+	dependency.srcSubpass = VK_SUBPASS_EXTERNAL; // Refers to the implicit subpass before or after the render pass depending on whether it is specified in srcSubpass or dstSubpass
+	dependency.dstSubpass = 0;
+
+	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT; // Specify the operations to wait on and the stages in which these operations occur.
+	// We need to wait for the swap chain to finish reading from the image before we can access it.
+	// This can be accomplished by waiting on the color attachment output stage itself.
+	dependency.srcAccessMask = 0;
+
+	// The operations that should wait on this are in the color attachment stage and involve the writing of the color attachment.
+	// These settings will prevent the transition from happening until it’s actually necessary (and allowed): when we want to start writing colors to it.
+	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
 	VkRenderPassCreateInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
 	renderPassInfo.attachmentCount = 1;
 	renderPassInfo.pAttachments = &colorAttachment;
 	renderPassInfo.subpassCount = 1;
 	renderPassInfo.pSubpasses = &subpass;
+	// Add our Subpass dependencies
+	renderPassInfo.dependencyCount = 1;
+	renderPassInfo.pDependencies = &dependency;
 
 	if (vkCreateRenderPass(pdevice->getLogicalDevice(), &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create render pass!");
