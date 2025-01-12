@@ -28,7 +28,7 @@ VkCommandBuffer* CommandBuffers::getCommandBufferPtr(const int index) {
 }
 
 // We pass the command buffer and the index of the current swapchain image we want to write to
-void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex, SwapChain* pSwapChain, RenderPass* pRenderPass, Pipeline* pPipeline, FrameBuffer* pFrameBuffer) {
+void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex, SwapChain* pSwapChain, RenderPass* pRenderPass, Pipeline* pPipeline, FrameBuffers* pFrameBuffer) {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 

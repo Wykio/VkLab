@@ -8,7 +8,7 @@
 #include "graphics/ImageViews.h"
 #include "graphics/Pipeline.h"
 #include "graphics/RenderPass.h"
-#include "graphics/FrameBuffer.h"
+#include "graphics/FrameBuffers.h"
 #include "graphics/CommandPool.h"
 #include "graphics/CommandBuffers.h"
 
@@ -52,7 +52,7 @@ private:
     ImageViews r_imageviews;
     Pipeline r_pipeline;
     RenderPass r_renderpass;
-    FrameBuffer r_framebuffer;
+    FrameBuffers r_framebuffer;
     CommandPool r_commandpool;
 
     CommandBuffers r_commandbuffers;

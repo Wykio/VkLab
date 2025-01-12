@@ -1,5 +1,5 @@
-#ifndef FRAMEBUFFER_H
-#define FRAMEBUFFER_H
+#ifndef FRAMEBUFFERS_H
+#define FRAMEBUFFERS_H
 
 #include "core/Device.h"
 #include "graphics/SwapChain.h"
@@ -8,7 +8,7 @@
 
 #include <vulkan/vulkan.h>
 
-class FrameBuffer
+class FrameBuffers
 {
 public:
 	void initialize(Device* pdevice, SwapChain* pSwapChain, ImageViews* pImageViews, RenderPass* pRenderPass);
@@ -20,4 +20,4 @@ private:
 	std::vector<VkFramebuffer> swapChainFramebuffers;
 };
 
-#endif // FRAMEBUFFER_H
+#endif // FRAMEBUFFERS_H

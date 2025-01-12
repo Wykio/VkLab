@@ -23,11 +23,11 @@
     <ClInclude Include="include\core\Device.h" />
     <ClInclude Include="include\graphics\CommandBuffers.h" />
     <ClInclude Include="include\graphics\CommandPool.h" />
+    <ClInclude Include="include\graphics\FrameBuffers.h" />
     <ClInclude Include="include\graphics\ImageViews.h" />
     <ClInclude Include="include\graphics\Pipeline.h" />
     <ClInclude Include="include\graphics\SwapChain.h" />
     <ClInclude Include="include\core\VulkanInstance.h" />
-    <ClInclude Include="include\graphics\FrameBuffer.h" />
     <ClInclude Include="include\graphics\RenderPass.h" />
     <ClInclude Include="include\utils\DebugMessenger.h" />
     <ClInclude Include="include\core\Renderer.h" />
@@ -37,7 +37,7 @@
     <ClCompile Include="src\core\Device.cpp" />
     <ClCompile Include="src\graphics\CommandBuffers.cpp" />
     <ClCompile Include="src\graphics\CommandPool.cpp" />
-    <ClCompile Include="src\graphics\FrameBuffer.cpp" />
+    <ClCompile Include="src\graphics\FrameBuffers.cpp" />
     <ClCompile Include="src\graphics\ImageViews.cpp" />
     <ClCompile Include="src\graphics\Pipeline.cpp" />
     <ClCompile Include="src\graphics\SwapChain.cpp" />

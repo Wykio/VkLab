@@ -1,6 +1,6 @@
-#include "graphics/FrameBuffer.h"
+#include "graphics/FrameBuffers.h"
 
-void FrameBuffer::initialize(Device* pdevice, SwapChain* pSwapChain, ImageViews* pImageViews, RenderPass* pRenderPass) {
+void FrameBuffers::initialize(Device* pdevice, SwapChain* pSwapChain, ImageViews* pImageViews, RenderPass* pRenderPass) {
     size_t swapChainImageViewsSize = pImageViews->getSwapChainImageViews().size();
     VkExtent2D swapChainExtent = pSwapChain->getSwapChainExtent();
 
@@ -27,12 +27,12 @@ void FrameBuffer::initialize(Device* pdevice, SwapChain* pSwapChain, ImageViews*
     }
 }
 
-void FrameBuffer::cleanup(Device* pdevice) {
+void FrameBuffers::cleanup(Device* pdevice) {
     for (auto framebuffer : swapChainFramebuffers) {
         vkDestroyFramebuffer(pdevice->getLogicalDevice(), framebuffer, nullptr);
     }
 }
 
-const std::vector<VkFramebuffer> FrameBuffer::getSwapChainFramebuffers() {
+const std::vector<VkFramebuffer> FrameBuffers::getSwapChainFramebuffers() {
     return swapChainFramebuffers;
 }
