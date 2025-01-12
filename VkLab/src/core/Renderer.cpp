@@ -12,9 +12,11 @@ void Renderer::initWindow() {
     glfwInit();
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-    window = glfwCreateWindow(WIDTH, HEIGHT, "Ksoss renderer", nullptr, nullptr);
+    window = glfwCreateWindow(WIDTH, HEIGHT, "Renderer", nullptr, nullptr);
+    glfwSetWindowUserPointer(window, this);
+    glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 }
 
 // Initializes Vulkan components needed for the application.
@@ -28,7 +30,7 @@ void Renderer::initVulkan() {
     createSurface();
 
     r_device.initialize(r_instance.getInstance(), &surface, &graphicsQueue, &presentQueue);
-    r_swapchain.initialize(&r_device, &surface, window);
+    r_swapchain.initialize(window, &surface, &r_device);
     r_imageviews.initialize(&r_device, &r_swapchain);
     r_renderpass.initialize(&r_device, &r_swapchain);
     r_pipeline.initialize(&r_device, &r_renderpass);
@@ -52,6 +54,12 @@ void Renderer::mainLoop() {
 
 // Cleans up all Vulkan and GLFW resources.
 void Renderer::cleanup() {
+    cleanupSwapChain();
+
+    r_pipeline.cleanup(&r_device);
+
+    r_renderpass.cleanup(&r_device);
+
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         vkDestroySemaphore(r_device.getLogicalDevice(), renderFinishedSemaphores[i], nullptr);
         vkDestroySemaphore(r_device.getLogicalDevice(), imageAvailableSemaphores[i], nullptr);
@@ -59,11 +67,7 @@ void Renderer::cleanup() {
     }
 
     r_commandpool.cleanup(&r_device);
-    r_framebuffer.cleanup(&r_device);
-    r_pipeline.cleanup(&r_device);
-    r_renderpass.cleanup(&r_device);
-    r_imageviews.cleanup(&r_device);
-    r_swapchain.cleanup(&r_device);
+
     r_device.cleanup();
 
     if (enableValidationLayers) {
@@ -107,11 +111,18 @@ void Renderer::drawFrame() {
 
     // - Wait for the previous frame to finish
     vkWaitForFences(r_device.getLogicalDevice(), 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
-    vkResetFences(r_device.getLogicalDevice(), 1, &inFlightFences[currentFrame]);
     
     uint32_t imageIndex;
     // Recall that the swap chain is an extension feature, so we must use a function with the vk*KHR naming convention
-    vkAcquireNextImageKHR(r_device.getLogicalDevice(), r_swapchain.getSwapChain(), UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+    VkResult result = vkAcquireNextImageKHR(r_device.getLogicalDevice(), r_swapchain.getSwapChain(), UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+    if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+        recreateSwapChain();
+    } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) { // VK_SUBOPTIMAL_KHR is ok because we still have an image
+        throw std::runtime_error("failed to acquire swap chain image!");
+    }
+
+    // Only reset the fence if we are submitting work (avoid Deadlock)
+    vkResetFences(r_device.getLogicalDevice(), 1, &inFlightFences[currentFrame]);
 
     vkResetCommandBuffer(r_commandbuffers.getCommandBuffer(currentFrame), /*VkCommandBufferResetFlagBits*/ 0);
     recordCommandBuffer(r_commandbuffers.getCommandBuffer(currentFrame), imageIndex, &r_swapchain, &r_renderpass, &r_pipeline, &r_framebuffer);
@@ -153,7 +164,14 @@ void Renderer::drawFrame() {
     // With 1 swapChain, you can simply use the return value of the vkQueuePresentKHR function.
 
     // Submits the request to present an image to the swap chain.
-    vkQueuePresentKHR(presentQueue, &presentInfo);
+    result = vkQueuePresentKHR(presentQueue, &presentInfo);
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) { // Because we want the best possible result.
+        framebufferResized = false; // Ensure that the semaphores are in a consistent state, otherwise a signaled semaphore may never be properly waited upon
+        recreateSwapChain();
+    }
+    else if (result != VK_SUCCESS) {
+        throw std::runtime_error("failed to present swap chain image!");
+    }
 
     // advance to the next frame every time
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT; // By using the modulo (%) operator, we ensure that the frame index loops around after every MAX_FRAMES_IN_FLIGHT enqueued frames.
@@ -170,7 +188,7 @@ void Renderer::createSyncObjects() {
     VkFenceCreateInfo fenceInfo{};
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT; // To be signaled the first time we wait for it
-     
+
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         if (vkCreateSemaphore(r_device.getLogicalDevice(), &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
             vkCreateSemaphore(r_device.getLogicalDevice(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
@@ -179,5 +197,36 @@ void Renderer::createSyncObjects() {
             throw std::runtime_error("failed to create synchronization objects for a frame!");
         }
     }
+}
 
+
+void Renderer::cleanupSwapChain() {
+    r_framebuffer.cleanup(&r_device);
+    r_imageviews.cleanup(&r_device);
+    r_swapchain.cleanup(&r_device);
+}
+
+void Renderer::recreateSwapChain() {
+    // Avoid crash when minimized
+    int width = 0, height = 0;
+    glfwGetFramebufferSize(window, &width, &height); // Retrieve frame buffer size
+    while (width == 0 || height == 0) {
+        glfwGetFramebufferSize(window, &width, &height);
+        glfwWaitEvents(); // While frame buffer size is 0 -> wait()
+    }
+
+    auto logicalDevice = r_device.getLogicalDevice();
+    vkDeviceWaitIdle(logicalDevice); // We shouldn’t touch resources that may still be in use
+
+    cleanupSwapChain();
+
+    r_swapchain.initialize(window, &surface, &r_device);
+    r_imageviews.initialize(&r_device, &r_swapchain);
+    r_framebuffer.initialize(&r_device, &r_swapchain, &r_imageviews, &r_renderpass);
+}
+
+// GLFW does not know how to properly call a member function with the right this pointer to our instance
+static void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
+    auto app = reinterpret_cast<Renderer*>(glfwGetWindowUserPointer(window));
+    app->framebufferResized = true;
 }

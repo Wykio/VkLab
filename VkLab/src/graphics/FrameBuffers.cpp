@@ -28,8 +28,9 @@ void FrameBuffers::initialize(Device* pdevice, SwapChain* pSwapChain, ImageViews
 }
 
 void FrameBuffers::cleanup(Device* pdevice) {
+    VkDevice logicalDevice = pdevice->getLogicalDevice();
     for (auto framebuffer : swapChainFramebuffers) {
-        vkDestroyFramebuffer(pdevice->getLogicalDevice(), framebuffer, nullptr);
+        vkDestroyFramebuffer(logicalDevice, framebuffer, nullptr);
     }
 }
 

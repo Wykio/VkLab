@@ -1,6 +1,6 @@
 #include "graphics/SwapChain.h"
 
-void SwapChain::initialize(Device* pdevice, VkSurfaceKHR* psurface, GLFWwindow* window) {
+void SwapChain::initialize(GLFWwindow* pwindow, VkSurfaceKHR* psurface, Device* pdevice) {
     VkPhysicalDevice physicalDevice = pdevice->getPhysicalDevice();
     VkDevice logicalDevice = pdevice->getLogicalDevice();
 
@@ -8,7 +8,7 @@ void SwapChain::initialize(Device* pdevice, VkSurfaceKHR* psurface, GLFWwindow* 
 
     VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
     VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
-    VkExtent2D extent = chooseSwapExtent(swapChainSupport.capabilities, window);
+    VkExtent2D extent = chooseSwapExtent(swapChainSupport.capabilities, pwindow);
 
     // How many images we would like to have in the swap chain
     uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;

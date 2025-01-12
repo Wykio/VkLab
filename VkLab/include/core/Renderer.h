@@ -24,6 +24,8 @@ class Renderer {
 public:
     void run();
 
+    bool framebufferResized = false; // Handle resize explicitly
+
 private:
     void initWindow();
     void initVulkan();
@@ -34,6 +36,9 @@ private:
     void createSurface();
     void drawFrame();
     void createSyncObjects();
+
+    void cleanupSwapChain();
+    void recreateSwapChain();
 
     // Vulkan resources
     GLFWwindow* window;
@@ -63,5 +68,7 @@ private:
 
     uint32_t currentFrame = 0;
 };
+
+static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
 #endif // RENDERER_H

@@ -8,11 +8,12 @@
 #include <vector>
 #include <algorithm> // Necessary for std::clamp
 
+class ImageViews; //
 
 class SwapChain
 {
 public:
-	void initialize(Device* device, VkSurfaceKHR* psurface, GLFWwindow* window);
+	void initialize(GLFWwindow* window, VkSurfaceKHR* psurface, Device* pdevice);
 	void cleanup(Device* device);
 	const VkSwapchainKHR getSwapChain();
 	const std::vector<VkImage> getSwapChainImages();
