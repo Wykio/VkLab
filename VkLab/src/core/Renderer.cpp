@@ -36,6 +36,7 @@ void Renderer::initVulkan() {
     r_pipeline.initialize(&r_device, &r_renderpass);
     r_framebuffer.initialize(&r_device, &r_swapchain, &r_imageviews, &r_renderpass);
     r_commandpool.initialize(&r_device, &surface);
+    r_vertexbuffer.initialize(&r_device);
     r_commandbuffers.initialize(&r_device, &r_commandpool);
 
     createSyncObjects();
@@ -56,8 +57,8 @@ void Renderer::mainLoop() {
 void Renderer::cleanup() {
     cleanupSwapChain();
 
+    r_vertexbuffer.cleanup(&r_device);
     r_pipeline.cleanup(&r_device);
-
     r_renderpass.cleanup(&r_device);
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
@@ -67,7 +68,6 @@ void Renderer::cleanup() {
     }
 
     r_commandpool.cleanup(&r_device);
-
     r_device.cleanup();
 
     if (enableValidationLayers) {
@@ -125,7 +125,7 @@ void Renderer::drawFrame() {
     vkResetFences(r_device.getLogicalDevice(), 1, &inFlightFences[currentFrame]);
 
     vkResetCommandBuffer(r_commandbuffers.getCommandBuffer(currentFrame), /*VkCommandBufferResetFlagBits*/ 0);
-    recordCommandBuffer(r_commandbuffers.getCommandBuffer(currentFrame), imageIndex, &r_swapchain, &r_renderpass, &r_pipeline, &r_framebuffer);
+    recordCommandBuffer(r_commandbuffers.getCommandBuffer(currentFrame), imageIndex, &r_swapchain, &r_renderpass, &r_pipeline, &r_framebuffer, &r_vertexbuffer);
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

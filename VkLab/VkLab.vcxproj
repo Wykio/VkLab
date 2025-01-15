@@ -29,6 +29,7 @@
     <ClInclude Include="include\graphics\SwapChain.h" />
     <ClInclude Include="include\core\VulkanInstance.h" />
     <ClInclude Include="include\graphics\RenderPass.h" />
+    <ClInclude Include="include\graphics\Vertex.h" />
     <ClInclude Include="include\utils\DebugMessenger.h" />
     <ClInclude Include="include\core\Renderer.h" />
     <ClInclude Include="include\utils\shaderUtils.h" />
@@ -43,6 +44,7 @@
     <ClCompile Include="src\graphics\SwapChain.cpp" />
     <ClCompile Include="src\core\VulkanInstance.cpp" />
     <ClCompile Include="src\graphics\RenderPass.cpp" />
+    <ClCompile Include="src\graphics\Vertex.cpp" />
     <ClCompile Include="src\utils\DebugMessenger.cpp" />
     <ClCompile Include="src\core\Renderer.cpp" />
     <ClCompile Include="src\main.cpp" />

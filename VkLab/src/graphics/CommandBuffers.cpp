@@ -28,7 +28,7 @@ VkCommandBuffer* CommandBuffers::getCommandBufferPtr(const int index) {
 }
 
 // We pass the command buffer and the index of the current swapchain image we want to write to
-void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex, SwapChain* pSwapChain, RenderPass* pRenderPass, Pipeline* pPipeline, FrameBuffers* pFrameBuffer) {
+void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex, SwapChain* pSwapChain, RenderPass* pRenderPass, Pipeline* pPipeline, FrameBuffers* pFrameBuffer, VertexBuffer* pvertexbuffer) {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -51,6 +51,11 @@ void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex, Swa
 
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pPipeline->getGraphicsPipeline());
 
+    // Bind the vertex buffer
+    VkBuffer vertexBuffers[] = { pvertexbuffer->getVertexBuffer() };
+    VkDeviceSize offsets[] = { 0 };
+    vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets); // Bind vertex buffers to bindings
+
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
@@ -65,7 +70,7 @@ void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex, Swa
     scissor.extent = pSwapChain->getSwapChainExtent();
     vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-    vkCmdDraw(commandBuffer, 6, 1, 0, 0);
+    vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0);
 
     vkCmdEndRenderPass(commandBuffer);
 

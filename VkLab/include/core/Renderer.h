@@ -11,6 +11,7 @@
 #include "graphics/FrameBuffers.h"
 #include "graphics/CommandPool.h"
 #include "graphics/CommandBuffers.h"
+#include "graphics/Vertex.h"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -59,7 +60,7 @@ private:
     RenderPass r_renderpass;
     FrameBuffers r_framebuffer;
     CommandPool r_commandpool;
-
+    VertexBuffer r_vertexbuffer;
     CommandBuffers r_commandbuffers;
 
     std::vector<VkSemaphore> imageAvailableSemaphores;

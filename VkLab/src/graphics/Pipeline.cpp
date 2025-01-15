@@ -26,13 +26,16 @@ void Pipeline::initialize(Device* pdevice, RenderPass* prenderpass) {
     // Define pipeline shader stages
     VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
 
-    // Describes the format of the vertex data that will be passed to the vertex shader
-    VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+    // Pass all Vertex descriptions
+    auto bindingDescription = Vertex::getBindingDescription();
+    auto attributeDescription = Vertex::getAttributeDescriptions();
+
+    VkPipelineVertexInputStateCreateInfo vertexInputInfo{}; 
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputInfo.vertexBindingDescriptionCount = 0; // Because we’re hard coding the vertex data directly in the vertex shader
-    vertexInputInfo.pVertexBindingDescriptions = nullptr; // Optional
-    vertexInputInfo.vertexAttributeDescriptionCount = 0; // Type of the attributes passed to the vertex shader
-    vertexInputInfo.pVertexAttributeDescriptions = nullptr; // Optional
+    vertexInputInfo.vertexBindingDescriptionCount = 1;
+    vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+    vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescription.size());
+    vertexInputInfo.pVertexAttributeDescriptions = attributeDescription.data();
 
     // Describes two things: 1) what kind of geometry will be drawn from the vertices 2) if primitive restart should be enabled.
     VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
