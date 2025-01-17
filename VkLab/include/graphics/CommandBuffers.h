@@ -6,7 +6,7 @@
 #include "graphics/RenderPass.h"
 #include "graphics/Pipeline.h"
 #include "graphics/FrameBuffers.h"
-#include "graphics/CommandPool.h"
+#include "graphics/CommandPools.h"
 #include "graphics/Vertex.h"
 
 #include <vulkan/vulkan.h>
@@ -14,7 +14,7 @@
 class CommandBuffers
 {
 public:
-	void initialize(Device* pdevice, CommandPool* pCommandPool);
+	void initialize(Device* pdevice, CommandPools* pCommandPool);
 	std::vector<VkCommandBuffer> getCommandBuffers();
 	VkCommandBuffer getCommandBuffer(const int index);
 	VkCommandBuffer* getCommandBufferPtr(const int index); // not a very good practice :/

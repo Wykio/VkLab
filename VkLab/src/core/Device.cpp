@@ -10,10 +10,10 @@ Device::~Device() {
     cleanup();
 }
 
-void Device::initialize(VkInstance instance, VkSurfaceKHR* psurface, VkQueue* pgraphicsQueue, VkQueue* ppresentQueue) {
+void Device::initialize(VkInstance instance, VkSurfaceKHR* psurface, VkQueue* pgraphicsQueue, VkQueue* ppresentQueue, VkQueue* ptransferQueue) {
     this->psurface = psurface;
     pickPhysicalDevice(instance);
-    createLogicalDevice(pgraphicsQueue, ppresentQueue);
+    createLogicalDevice(pgraphicsQueue, ppresentQueue, ptransferQueue);
 }
 
 void Device::cleanup() {
@@ -48,7 +48,7 @@ void Device::pickPhysicalDevice(VkInstance instance) {
 }
 
 // Creates a Vulkan logical device for the selected GPU.
-void Device::createLogicalDevice(VkQueue* graphicsQueue, VkQueue* presentQueue) {
+void Device::createLogicalDevice(VkQueue* pgraphicsQueue, VkQueue* ppresentQueue, VkQueue* ptransferQueue) {
     // Next, we need to have multiple VkDeviceQueueCreateInfo structs to create a queue from both families.
     // An elegant way to do that is to create a set of all unique queue families that are necessary for the required queues
     QueueFamilyIndices indices = findQueueFamilies(physicalDevice, psurface);
@@ -96,8 +96,9 @@ void Device::createLogicalDevice(VkQueue* graphicsQueue, VkQueue* presentQueue) 
     }
 
     // call to retrieve the queue handle
-    vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, graphicsQueue);
-    vkGetDeviceQueue(device, indices.presentFamily.value(), 0, presentQueue);
+    vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, pgraphicsQueue);
+    vkGetDeviceQueue(device, indices.presentFamily.value(), 0, ppresentQueue);
+    vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, ptransferQueue);
 }
 
 VkPhysicalDevice Device::getPhysicalDevice() {
@@ -138,6 +139,10 @@ QueueFamilyIndices findQueueFamilies(VkPhysicalDevice physicalDevice, VkSurfaceK
     for (const auto& queueFamily : queueFamilies) {
         if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
             indices.graphicsFamily = i;
+        }
+
+        if (queueFamily.queueFlags & VK_QUEUE_TRANSFER_BIT) {
+            indices.transferFamily = i;
         }
 
         VkBool32 presentSupport = false;

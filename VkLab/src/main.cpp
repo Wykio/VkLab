@@ -8,6 +8,8 @@ int main() {
     }
     catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
+        std::cout << "Press Enter to exit..." << std::endl;
+        std::cin.get(); // Waits for user input
         return EXIT_FAILURE;
     }
 

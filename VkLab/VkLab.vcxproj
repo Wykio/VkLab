@@ -22,7 +22,7 @@
     <ClInclude Include="include\core\Constant.h" />
     <ClInclude Include="include\core\Device.h" />
     <ClInclude Include="include\graphics\CommandBuffers.h" />
-    <ClInclude Include="include\graphics\CommandPool.h" />
+    <ClInclude Include="include\graphics\CommandPools.h" />
     <ClInclude Include="include\graphics\FrameBuffers.h" />
     <ClInclude Include="include\graphics\ImageViews.h" />
     <ClInclude Include="include\graphics\Pipeline.h" />
@@ -37,7 +37,7 @@
   <ItemGroup>
     <ClCompile Include="src\core\Device.cpp" />
     <ClCompile Include="src\graphics\CommandBuffers.cpp" />
-    <ClCompile Include="src\graphics\CommandPool.cpp" />
+    <ClCompile Include="src\graphics\CommandPools.cpp" />
     <ClCompile Include="src\graphics\FrameBuffers.cpp" />
     <ClCompile Include="src\graphics\ImageViews.cpp" />
     <ClCompile Include="src\graphics\Pipeline.cpp" />

@@ -16,9 +16,10 @@ const std::vector<const char*> deviceExtensions = {
 struct QueueFamilyIndices {
 	std::optional<uint32_t> graphicsFamily;
 	std::optional<uint32_t> presentFamily;
+	std::optional<uint32_t> transferFamily;
 
 	bool isComplete() {
-		return graphicsFamily.has_value() && presentFamily.has_value();
+		return graphicsFamily.has_value() && presentFamily.has_value() && transferFamily.has_value();
 	}
 };
 
@@ -32,10 +33,10 @@ class Device {
 public:
 	Device();
 	~Device();
-	void initialize(VkInstance instance, VkSurfaceKHR* psurface, VkQueue* pgraphicsQueue, VkQueue* ppresentQueue);
+	void initialize(VkInstance instance, VkSurfaceKHR* psurface, VkQueue* pgraphicsQueue, VkQueue* ppresentQueue, VkQueue* ptransferQueue);
 	void cleanup();
 	void pickPhysicalDevice(VkInstance instance);
-	void createLogicalDevice(VkQueue* graphicsQueue, VkQueue* presentQueue);
+	void createLogicalDevice(VkQueue* pgraphicsQueue, VkQueue* ppresentQueue, VkQueue* ptransferQueue);
 	VkPhysicalDevice getPhysicalDevice();
 	VkDevice getLogicalDevice();
 

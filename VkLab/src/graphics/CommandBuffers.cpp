@@ -1,12 +1,12 @@
 #include "graphics/CommandBuffers.h"
 
 
-void CommandBuffers::initialize(Device* pdevice, CommandPool* pCommandPool) {
+void CommandBuffers::initialize(Device* pdevice, CommandPools* pCommandPools) {
     commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = pCommandPool->getCommandPool();
+    allocInfo.commandPool = pCommandPools->getDrawCommandPool();
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY; // Can be submitted to a queue for execution, but cannot be called from other command buffers.
     allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
 

@@ -9,7 +9,7 @@
 #include "graphics/Pipeline.h"
 #include "graphics/RenderPass.h"
 #include "graphics/FrameBuffers.h"
-#include "graphics/CommandPool.h"
+#include "graphics/CommandPools.h"
 #include "graphics/CommandBuffers.h"
 #include "graphics/Vertex.h"
 
@@ -53,13 +53,14 @@ private:
 
     VkQueue graphicsQueue = VK_NULL_HANDLE;
     VkQueue presentQueue = VK_NULL_HANDLE;
+    VkQueue transferQueue = VK_NULL_HANDLE;
 
     SwapChain r_swapchain;
     ImageViews r_imageviews;
     Pipeline r_pipeline;
     RenderPass r_renderpass;
     FrameBuffers r_framebuffer;
-    CommandPool r_commandpool;
+    CommandPools r_commandpools;
     VertexBuffer r_vertexbuffer;
     CommandBuffers r_commandbuffers;
 

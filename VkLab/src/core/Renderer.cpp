@@ -29,15 +29,15 @@ void Renderer::initVulkan() {
 
     createSurface();
 
-    r_device.initialize(r_instance.getInstance(), &surface, &graphicsQueue, &presentQueue);
+    r_device.initialize(r_instance.getInstance(), &surface, &graphicsQueue, &presentQueue, &transferQueue);
     r_swapchain.initialize(window, &surface, &r_device);
     r_imageviews.initialize(&r_device, &r_swapchain);
     r_renderpass.initialize(&r_device, &r_swapchain);
     r_pipeline.initialize(&r_device, &r_renderpass);
     r_framebuffer.initialize(&r_device, &r_swapchain, &r_imageviews, &r_renderpass);
-    r_commandpool.initialize(&r_device, &surface);
+    r_commandpools.initialize(&r_device, &surface);
     r_vertexbuffer.initialize(&r_device);
-    r_commandbuffers.initialize(&r_device, &r_commandpool);
+    r_commandbuffers.initialize(&r_device, &r_commandpools);
 
     createSyncObjects();
 }
@@ -67,7 +67,7 @@ void Renderer::cleanup() {
         vkDestroyFence(r_device.getLogicalDevice(), inFlightFences[i], nullptr);
     }
 
-    r_commandpool.cleanup(&r_device);
+    r_commandpools.cleanup(&r_device);
     r_device.cleanup();
 
     if (enableValidationLayers) {
