@@ -51,7 +51,7 @@ const std::vector<Vertex> vertices = { // interleaving vertex attributes
 class VertexBuffer
 {
 public:
-    void initialize(Device* pdevice);
+    void initialize(Device* pdevice, VkQueue queue, CommandPools* commandPools);
     void cleanup(Device* pdevice);
     VkBuffer getVertexBuffer();
 

@@ -36,7 +36,7 @@ void Renderer::initVulkan() {
     r_pipeline.initialize(&r_device, &r_renderpass);
     r_framebuffer.initialize(&r_device, &r_swapchain, &r_imageviews, &r_renderpass);
     r_commandpools.initialize(&r_device, &surface);
-    r_vertexbuffer.initialize(&r_device);
+    r_vertexbuffer.initialize(&r_device, graphicsQueue, &r_commandpools);
     r_commandbuffers.initialize(&r_device, &r_commandpools);
 
     createSyncObjects();

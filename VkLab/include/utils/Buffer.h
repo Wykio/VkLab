@@ -1,4 +1,5 @@
 #include "core/Device.h"
+#include "graphics/CommandPools.h"
 
 #include <vulkan/vulkan.h>
 
@@ -40,6 +41,51 @@ static void createBuffer(Device* pdevice, VkDeviceSize deviceSize, VkBufferUsage
 	vkBindBufferMemory(logicalDevice, buffer, bufferMemory, 0);
 }
 
+// Copy the contents from one buffer to another using a transfer command pool
+static void copyBuffer(Device* pdevice, VkQueue queue, CommandPools* commandPools, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
+	auto logicalDevice = pdevice->getLogicalDevice();
+	auto commandPool = commandPools->getDrawCommandPool();
+
+	// Allocate a temporary command buffer
+	VkCommandBufferAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandPool = commandPool;
+	allocInfo.commandBufferCount = 1;
+
+	VkCommandBuffer commandBuffer;
+	vkAllocateCommandBuffers(logicalDevice, &allocInfo, &commandBuffer);
+
+	// Start recording the commandBuffer;
+	VkCommandBufferBeginInfo beginInfo{};
+	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	// We’re only going to use the command buffer once and wait with returning from the function until the copy operation has finished executing
+	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+	vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+	// Transfer buffer content
+	VkBufferCopy copyRegion{};
+	copyRegion.srcOffset = 0; // Optional
+	copyRegion.dstOffset = 0; // Optional
+	copyRegion.size = size;
+	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+
+	// End recording
+	vkEndCommandBuffer(commandBuffer);
+
+	// Send command buffer to the queue and wait for it to finish
+	VkSubmitInfo submitInfo{};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &commandBuffer;
+
+	vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE);
+	vkQueueWaitIdle(queue);
+
+	// Free the commandBuffer
+	vkFreeCommandBuffers(logicalDevice, commandPool, 1, &commandBuffer);
+}
 // typeFilter parameter is used to specify the bit field of memory types that are suitable
 static uint32_t findMemoryType(Device* pdevice, uint32_t typeFilter, VkMemoryPropertyFlags properties) {
 	// Query about the available types of memory
