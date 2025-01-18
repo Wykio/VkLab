@@ -29,14 +29,14 @@ void Renderer::initVulkan() {
 
     createSurface();
 
-    r_device.initialize(r_instance.getInstance(), &surface, &graphicsQueue, &presentQueue, &transferQueue);
+    r_device.initialize(r_instance.getInstance());
     r_swapchain.initialize(window, &surface, &r_device);
     r_imageviews.initialize(&r_device, &r_swapchain);
     r_renderpass.initialize(&r_device, &r_swapchain);
     r_pipeline.initialize(&r_device, &r_renderpass);
     r_framebuffer.initialize(&r_device, &r_swapchain, &r_imageviews, &r_renderpass);
     r_commandpools.initialize(&r_device, &surface);
-    r_vertexbuffer.initialize(&r_device, graphicsQueue, &r_commandpools);
+    r_vertexbuffer.initialize(&surface, &r_device, graphicsQueue, &r_commandpools);
     r_commandbuffers.initialize(&r_device, &r_commandpools);
 
     createSyncObjects();
@@ -83,9 +83,11 @@ void Renderer::cleanup() {
 
 // Creates a Vulkan surface for the GLFW window.
 void Renderer::createSurface() {
-    if (glfwCreateWindowSurface(r_instance.getInstance(), window, nullptr, &surface) != VK_SUCCESS) {
+    if (glfwCreateWindowSurface(r_instance.getInstance(), window, nullptr, &RendererContext::getInstance().surface) != VK_SUCCESS) {
         throw std::runtime_error("failed to create window surface!");
     }
+
+    std::cout << "Surface created and stored in RendererContext.\n";
 }
 
 void Renderer::drawFrame() {
@@ -198,7 +200,6 @@ void Renderer::createSyncObjects() {
         }
     }
 }
-
 
 void Renderer::cleanupSwapChain() {
     r_framebuffer.cleanup(&r_device);

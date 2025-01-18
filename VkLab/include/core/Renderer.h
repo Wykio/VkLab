@@ -1,6 +1,7 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include "core/RendererContext.h" // Include singleton
 #include "core/Constant.h"
 #include "core/VulkanInstance.h"
 #include "core/Device.h"
@@ -47,13 +48,8 @@ private:
     VulkanInstance r_instance;
 
     DebugMessenger r_debugMessenger;
-    VkSurfaceKHR surface = VK_NULL_HANDLE;
 
     Device r_device;
-
-    VkQueue graphicsQueue = VK_NULL_HANDLE;
-    VkQueue presentQueue = VK_NULL_HANDLE;
-    VkQueue transferQueue = VK_NULL_HANDLE;
 
     SwapChain r_swapchain;
     ImageViews r_imageviews;

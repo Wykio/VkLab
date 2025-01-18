@@ -3,19 +3,31 @@
 
 #include <vulkan/vulkan.h>
 
-static void createBuffer(Device* pdevice, VkDeviceSize deviceSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+static void createBuffer(VkSurfaceKHR* psurface, Device* pdevice, VkDeviceSize deviceSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 static uint32_t findMemoryType(Device* pdevice, uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 // Function to create many different types of buffers. The last two parameters are output variables to write the handles to.
-static void createBuffer(Device* pdevice, VkDeviceSize deviceSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
+static void createBuffer(VkSurfaceKHR* psurface, Device* pdevice, VkDeviceSize deviceSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
 	auto logicalDevice = pdevice->getLogicalDevice();
+	
+	QueueFamilyIndices indices = findQueueFamilies(pdevice->getPhysicalDevice(), psurface);
+	uint32_t queueFamilyIndices[] = { indices.graphicsFamily.value(), indices.transferFamily.value() };
 
 	// Create the buffer
 	VkBufferCreateInfo bufferInfo{};
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	bufferInfo.size = deviceSize;
 	bufferInfo.usage = usage;
-	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+	if (indices.graphicsFamily != indices.transferFamily) {
+		bufferInfo.sharingMode = VK_SHARING_MODE_CONCURRENT;
+		bufferInfo.queueFamilyIndexCount = 2;
+		bufferInfo.pQueueFamilyIndices = queueFamilyIndices;
+		std::cout << "Transfer Queue Index is different than Graphic Queue Index" << std::endl;
+	}
+	else {
+		bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	}
 
 	if (vkCreateBuffer(logicalDevice, &bufferInfo, nullptr, &buffer) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create buffer!");
@@ -42,9 +54,8 @@ static void createBuffer(Device* pdevice, VkDeviceSize deviceSize, VkBufferUsage
 }
 
 // Copy the contents from one buffer to another using a transfer command pool
-static void copyBuffer(Device* pdevice, VkQueue queue, CommandPools* commandPools, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
+static void copyBuffer(Device* pdevice, VkQueue queue, VkCommandPool commandPool, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
 	auto logicalDevice = pdevice->getLogicalDevice();
-	auto commandPool = commandPools->getDrawCommandPool();
 
 	// Allocate a temporary command buffer
 	VkCommandBufferAllocateInfo allocInfo{};
@@ -86,6 +97,7 @@ static void copyBuffer(Device* pdevice, VkQueue queue, CommandPools* commandPool
 	// Free the commandBuffer
 	vkFreeCommandBuffers(logicalDevice, commandPool, 1, &commandBuffer);
 }
+
 // typeFilter parameter is used to specify the bit field of memory types that are suitable
 static uint32_t findMemoryType(Device* pdevice, uint32_t typeFilter, VkMemoryPropertyFlags properties) {
 	// Query about the available types of memory

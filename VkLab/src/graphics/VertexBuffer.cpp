@@ -1,6 +1,6 @@
 #include "graphics/VertexBuffer.h"
 
-void VertexBuffer::initialize(Device* pdevice, VkQueue queue, CommandPools* commandPools) {
+void VertexBuffer::initialize(VkSurfaceKHR* psurface, Device* pdevice, VkQueue transferQueue, CommandPools* pcommandPools) {
     VkDevice logicalDevice = pdevice->getLogicalDevice();
 
     VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
@@ -9,6 +9,7 @@ void VertexBuffer::initialize(Device* pdevice, VkQueue queue, CommandPools* comm
     VkBuffer stagingBuffer; // For mapping and copying the vertex data.
     VkDeviceMemory stagingBufferMemory; 
     createBuffer(
+        psurface,
         pdevice,
         bufferSize,
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT, // Buffer can be used as source in a memory transfer operation
@@ -26,6 +27,7 @@ void VertexBuffer::initialize(Device* pdevice, VkQueue queue, CommandPools* comm
     vkUnmapMemory(logicalDevice, stagingBufferMemory);
 
     createBuffer(
+        psurface,
         pdevice,
         bufferSize,
         VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, // Buffer can be used as destination in a memory transfer operation
@@ -34,7 +36,7 @@ void VertexBuffer::initialize(Device* pdevice, VkQueue queue, CommandPools* comm
         vertexBufferMemory
     );
 
-    copyBuffer(pdevice, queue, commandPools, stagingBuffer, vertexBuffer, bufferSize);
+    copyBuffer(pdevice, transferQueue, pcommandPools->getTransferCommandPool(), stagingBuffer, vertexBuffer, bufferSize);
 
     vkDestroyBuffer(logicalDevice, stagingBuffer, nullptr);
     vkFreeMemory(logicalDevice, stagingBufferMemory, nullptr);
