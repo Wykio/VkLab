@@ -11,7 +11,7 @@
 #include "graphics/FrameBuffers.h"
 #include "graphics/CommandPools.h"
 #include "graphics/CommandBuffers.h"
-#include "graphics/Vertex.h"
+#include "graphics/VertexBuffer.h"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>

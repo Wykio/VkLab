@@ -7,7 +7,7 @@
 #include "graphics/Pipeline.h"
 #include "graphics/FrameBuffers.h"
 #include "graphics/CommandPools.h"
-#include "graphics/Vertex.h"
+#include "graphics/VertexBuffer.h"
 
 #include <vulkan/vulkan.h>
 

@@ -3,7 +3,7 @@
 
 #include "core/Device.h"
 #include "graphics/RenderPass.h"
-#include "graphics/Vertex.h"
+#include "graphics/VertexBuffer.h"
 #include "utils/shaderUtils.h"
 
 #include <iostream>
