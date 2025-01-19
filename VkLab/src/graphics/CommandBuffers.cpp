@@ -56,6 +56,10 @@ void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex, Swa
     VkDeviceSize offsets[] = { 0 };
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets); // Bind vertex buffers to bindings
 
+    // Bind the index buffer
+    VkBuffer indexBuffers = pvertexbuffer->getIndexBuffer();
+    vkCmdBindIndexBuffer(commandBuffer, indexBuffers, 0, VK_INDEX_TYPE_UINT16);
+
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
@@ -70,7 +74,8 @@ void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex, Swa
     scissor.extent = pSwapChain->getSwapChainExtent();
     vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-    vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0);
+    //vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0); // Without indexes
+    vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 
     vkCmdEndRenderPass(commandBuffer);
 

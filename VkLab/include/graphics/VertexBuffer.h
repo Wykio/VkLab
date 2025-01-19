@@ -42,10 +42,15 @@ struct Vertex
     }
 };
 
-const std::vector<Vertex> vertices = { // interleaving vertex attributes
-    {{0.0f, -0.5f}, {1.0f, 1.0f, 1.0f}},
-    {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-    {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+const std::vector<Vertex> vertices = {
+    {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+    {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+    {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+    {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+};
+
+const std::vector<uint16_t> indices = {
+    0, 1, 2, 2, 3, 0
 };
 
 class VertexBuffer
@@ -54,12 +59,16 @@ public:
     void initialize(Device* pdevice, CommandPools* pcommandPools);
     void cleanup(Device* pdevice);
     VkBuffer getVertexBuffer();
+    VkBuffer getIndexBuffer();
 
-private:
-    //uint32_t findMemoryType(Device* pdevice, uint32_t typeFilter, VkMemoryPropertyFlags properties);
+private: // Note: Try to create a single buffer for both of these with offsets for memory optimisation
+    void createVertexBuffer(Device* pdevice, CommandPools* pcommandPools);
+    void createIndexBuffer(Device* pdevice, CommandPools* pcommandPools);
 
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
+    VkBuffer indexBuffer;
+    VkDeviceMemory indexBufferMemory;
 };
 
 #endif // VERTEX_H
