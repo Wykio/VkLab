@@ -8,6 +8,8 @@
 
 #include <vulkan/vulkan.h>
 
+// The attachments specified during render pass creation are bound by wrapping them into a VkFramebuffer object.
+// A framebuffer object references all of the VkImageView objects that represent the attachments.
 class FrameBuffers
 {
 public:

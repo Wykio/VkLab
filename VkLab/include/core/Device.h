@@ -43,15 +43,14 @@ public:
 	void createLogicalDevice();
 	VkPhysicalDevice getPhysicalDevice();
 	VkDevice getLogicalDevice();
+	VkQueue getGraphicsQueue();
+	VkQueue getPresentQueue();
+	VkQueue getTransferQueue();
 
 private:
-	VkSurfaceKHR* psurface;
+	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 
-	VkPhysicalDevice physicalDevice;
-
-	VkDevice device;
-
-	QueueFamilyIndices queueFamilyIndices;
+	VkDevice device = VK_NULL_HANDLE;
 
 	VkQueue graphicsQueue = VK_NULL_HANDLE;
 	VkQueue presentQueue = VK_NULL_HANDLE;
@@ -62,6 +61,6 @@ private:
 bool isDeviceSuitable(VkPhysicalDevice physicalDevice);
 QueueFamilyIndices findQueueFamilies(VkPhysicalDevice physicalDevice);
 bool checkDeviceExtensionSupport(VkPhysicalDevice physicalDevice);
-SwapChainSupportDetails querySwapChainSupport(const VkPhysicalDevice device, const VkSurfaceKHR* psurface);
+SwapChainSupportDetails querySwapChainSupport(const VkPhysicalDevice device, const VkSurfaceKHR psurface);
 
 #endif // DEVICE_H

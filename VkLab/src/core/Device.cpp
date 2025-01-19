@@ -127,6 +127,18 @@ VkDevice Device::getLogicalDevice() {
     return device;
 }
 
+VkQueue Device::getGraphicsQueue() {
+    return graphicsQueue;
+}
+
+VkQueue Device::getPresentQueue() {
+    return presentQueue;
+}
+
+VkQueue Device::getTransferQueue() {
+    return transferQueue;
+}
+
 // Checks if the given physical device meets the requirements.
 bool isDeviceSuitable(VkPhysicalDevice physicalDevice) {
     QueueFamilyIndices indices = findQueueFamilies(physicalDevice);

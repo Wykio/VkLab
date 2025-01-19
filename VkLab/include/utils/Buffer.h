@@ -3,14 +3,14 @@
 
 #include <vulkan/vulkan.h>
 
-static void createBuffer(VkSurfaceKHR* psurface, Device* pdevice, VkDeviceSize deviceSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+static void createBuffer(Device* pdevice, VkDeviceSize deviceSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 static uint32_t findMemoryType(Device* pdevice, uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 // Function to create many different types of buffers. The last two parameters are output variables to write the handles to.
-static void createBuffer(VkSurfaceKHR* psurface, Device* pdevice, VkDeviceSize deviceSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
+static void createBuffer(Device* pdevice, VkDeviceSize deviceSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
 	auto logicalDevice = pdevice->getLogicalDevice();
 	
-	QueueFamilyIndices indices = findQueueFamilies(pdevice->getPhysicalDevice(), psurface);
+	QueueFamilyIndices indices = findQueueFamilies(pdevice->getPhysicalDevice());
 	uint32_t queueFamilyIndices[] = { indices.graphicsFamily.value(), indices.transferFamily.value() };
 
 	// Create the buffer
@@ -54,8 +54,9 @@ static void createBuffer(VkSurfaceKHR* psurface, Device* pdevice, VkDeviceSize d
 }
 
 // Copy the contents from one buffer to another using a transfer command pool
-static void copyBuffer(Device* pdevice, VkQueue queue, VkCommandPool commandPool, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
+static void copyBuffer(Device* pdevice, VkCommandPool commandPool, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
 	auto logicalDevice = pdevice->getLogicalDevice();
+	auto transferQueue = pdevice->getTransferQueue();
 
 	// Allocate a temporary command buffer
 	VkCommandBufferAllocateInfo allocInfo{};
@@ -91,8 +92,8 @@ static void copyBuffer(Device* pdevice, VkQueue queue, VkCommandPool commandPool
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &commandBuffer;
 
-	vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE);
-	vkQueueWaitIdle(queue);
+	vkQueueSubmit(transferQueue, 1, &submitInfo, VK_NULL_HANDLE);
+	vkQueueWaitIdle(transferQueue);
 
 	// Free the commandBuffer
 	vkFreeCommandBuffers(logicalDevice, commandPool, 1, &commandBuffer);

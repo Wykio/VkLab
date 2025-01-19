@@ -30,13 +30,13 @@ void Renderer::initVulkan() {
     createSurface();
 
     r_device.initialize(r_instance.getInstance());
-    r_swapchain.initialize(window, &surface, &r_device);
+    r_swapchain.initialize(window, &r_device);
     r_imageviews.initialize(&r_device, &r_swapchain);
     r_renderpass.initialize(&r_device, &r_swapchain);
     r_pipeline.initialize(&r_device, &r_renderpass);
     r_framebuffer.initialize(&r_device, &r_swapchain, &r_imageviews, &r_renderpass);
-    r_commandpools.initialize(&r_device, &surface);
-    r_vertexbuffer.initialize(&surface, &r_device, graphicsQueue, &r_commandpools);
+    r_commandpools.initialize(&r_device);
+    r_vertexbuffer.initialize(&r_device, &r_commandpools);
     r_commandbuffers.initialize(&r_device, &r_commandpools);
 
     createSyncObjects();
@@ -74,7 +74,7 @@ void Renderer::cleanup() {
         r_debugMessenger.cleanup(r_instance.getInstance());
     }
 
-    vkDestroySurfaceKHR(r_instance.getInstance(), surface, nullptr);
+    vkDestroySurfaceKHR(r_instance.getInstance(), RendererContext::getInstance().surface, nullptr);
     r_instance.cleanup();
 
     glfwDestroyWindow(window);
@@ -146,7 +146,7 @@ void Renderer::drawFrame() {
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores; // Specify which semaphores to signal once the command buffer(s) have finished execution
 
-    if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS) {
+    if (vkQueueSubmit(r_device.getGraphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS) {
         throw std::runtime_error("failed to submit draw command buffer!");
     }
 
@@ -166,7 +166,7 @@ void Renderer::drawFrame() {
     // With 1 swapChain, you can simply use the return value of the vkQueuePresentKHR function.
 
     // Submits the request to present an image to the swap chain.
-    result = vkQueuePresentKHR(presentQueue, &presentInfo);
+    result = vkQueuePresentKHR(r_device.getPresentQueue(), &presentInfo);
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) { // Because we want the best possible result.
         framebufferResized = false; // Ensure that the semaphores are in a consistent state, otherwise a signaled semaphore may never be properly waited upon
         recreateSwapChain();
@@ -221,7 +221,7 @@ void Renderer::recreateSwapChain() {
 
     cleanupSwapChain();
 
-    r_swapchain.initialize(window, &surface, &r_device);
+    r_swapchain.initialize(window, &r_device);
     r_imageviews.initialize(&r_device, &r_swapchain);
     r_framebuffer.initialize(&r_device, &r_swapchain, &r_imageviews, &r_renderpass);
 }

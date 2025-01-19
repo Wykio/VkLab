@@ -8,7 +8,7 @@
 class CommandPools
 {
 public:
-	void initialize(Device* pdevice, VkSurfaceKHR* psurface);
+	void initialize(Device* pdevice);
 	void cleanup(Device* pdevice);
 	VkCommandPool getDrawCommandPool();
 	VkCommandPool getTransferCommandPool();

@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 
-
+// Select validation layers
 const std::vector<const char*> validationLayers = {
     "VK_LAYER_KHRONOS_validation"
 };
@@ -13,7 +13,6 @@ const std::vector<const char*> validationLayers = {
 class DebugMessenger {
 public:
     DebugMessenger();
-
     void initialize(VkInstance instance);
     void cleanup(VkInstance instance);
 

@@ -1,6 +1,5 @@
 #include "graphics/RenderPass.h"
 
-
 void RenderPass::initialize(Device* pdevice, SwapChain* pswapchain) {
 	VkAttachmentDescription colorAttachment{}; // Single color attachement for now
 	colorAttachment.format = pswapchain->getSwapChainImageFormat();

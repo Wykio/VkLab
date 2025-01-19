@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="include\core\Constant.h" />
     <ClInclude Include="include\core\Device.h" />
+    <ClInclude Include="include\core\RendererContext.h" />
     <ClInclude Include="include\graphics\CommandBuffers.h" />
     <ClInclude Include="include\graphics\CommandPools.h" />
     <ClInclude Include="include\graphics\FrameBuffers.h" />

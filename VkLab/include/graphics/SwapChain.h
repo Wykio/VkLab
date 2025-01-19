@@ -13,7 +13,7 @@ class ImageViews; //
 class SwapChain
 {
 public:
-	void initialize(GLFWwindow* window, VkSurfaceKHR* psurface, Device* pdevice);
+	void initialize(GLFWwindow* window, Device* pdevice);
 	void cleanup(Device* device);
 	const VkSwapchainKHR getSwapChain();
 	const std::vector<VkImage> getSwapChainImages();
@@ -23,9 +23,9 @@ public:
 private:
 	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
-	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window);
+	VkExtent2D chooseSwapExtent(GLFWwindow* pwindow, const VkSurfaceCapabilitiesKHR& capabilities);
 
-	VkSwapchainKHR swapChain;
+	VkSwapchainKHR swapChain = VK_NULL_HANDLE;
 	std::vector<VkImage> swapChainImages;
 	VkFormat swapChainImageFormat;
 	VkExtent2D swapChainExtent;

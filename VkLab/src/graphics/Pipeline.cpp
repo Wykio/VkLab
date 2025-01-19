@@ -8,25 +8,28 @@ void Pipeline::initialize(Device* pdevice, RenderPass* prenderpass) {
 	std::cout << "vertShader size: " << vertShaderCode.size() << " octets" << std::endl; // Debug
 	std::cout << "fragShader size: " << fragShaderCode.size() << " octets" << std::endl; // Debug
 
+    // Shader modules are just a thin wrapper around the shader bytecode that we’ve previously loaded
 	VkShaderModule vertShaderModule = createShaderModule(vertShaderCode, &logicalDevice);
 	VkShaderModule fragShaderModule = createShaderModule(fragShaderCode, &logicalDevice);
 
+    // To actually use the shaders we’ll need to assign them to a specific pipeline stage
+    // through VkPipelineShaderStageCreateInfo structures as part of the actual pipeline creation process
     VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
     vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+    vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT; // used in vertex shader stage
     vertShaderStageInfo.module = vertShaderModule;
     vertShaderStageInfo.pName = "main"; // Shader function to call
 
     VkPipelineShaderStageCreateInfo fragShaderStageInfo{};
     fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+    fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT; // used in fragment shader stage
     fragShaderStageInfo.module = fragShaderModule;
     fragShaderStageInfo.pName = "main";
 
     // Define pipeline shader stages
     VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
 
-    // Pass all Vertex descriptions
+    // Pass all Vertex descriptions into the VkPipelineVertexInputStateCreateInfo
     auto bindingDescription = Vertex::getBindingDescription();
     auto attributeDescription = Vertex::getAttributeDescriptions();
 

@@ -2,6 +2,7 @@
 
 DebugMessenger::DebugMessenger() : debugMessenger(VK_NULL_HANDLE) {}
 
+// Setup and create the debug messenger
 void DebugMessenger::initialize(VkInstance instance) {
     VkDebugUtilsMessengerCreateInfoEXT createInfo;
     populateDebugMessengerCreateInfo(createInfo);
@@ -15,7 +16,7 @@ void DebugMessenger::cleanup(VkInstance instance) {
     destroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
 }
 
-// This function creates a Vulkan debug messenger if the extension is available.
+// Creates a Vulkan debug messenger if the extension is available.
 VkResult DebugMessenger::createDebugUtilsMessengerEXT(
     VkInstance instance,
     const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
@@ -30,7 +31,7 @@ VkResult DebugMessenger::createDebugUtilsMessengerEXT(
     }
 }
 
-// This function destroys the Vulkan debug messenger.
+// Destroys the debug messenger
 void DebugMessenger::destroyDebugUtilsMessengerEXT(
     VkInstance instance,
     VkDebugUtilsMessengerEXT debugMessenger,
@@ -41,7 +42,7 @@ void DebugMessenger::destroyDebugUtilsMessengerEXT(
     }
 }
 
-// Populates the debug messenger creation info structure.
+// Populates the debug messenger creation info structure
 void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
     createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -54,7 +55,7 @@ void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& create
     createInfo.pfnUserCallback = debugCallback;
 }
 
-// This function is a callback for handling validation layer messages from Vulkan.
+// This function is a callback for handling validation layer messages from Vulkan
 VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
     VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
     VkDebugUtilsMessageTypeFlagsEXT messageType,

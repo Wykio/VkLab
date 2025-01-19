@@ -8,6 +8,7 @@
 
 #include <iostream>
 
+// The Pipeline is assembled with the renderpass infos and shaders
 class Pipeline
 {
 public:
