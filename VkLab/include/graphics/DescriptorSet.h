@@ -25,6 +25,7 @@ public:
 	void initialize(Device* pdevice);
     void cleanup(Device* pdevice);
     void allocate(Device* pdevice, DescriptorPool* descriptorPool, BufferManager* bufferManager);
+    VkDescriptorSetLayout* getDescriptorSetLayoutPtr();
     VkDescriptorSet* getDescriptorSetPtr(uint32_t index);
 
 private:

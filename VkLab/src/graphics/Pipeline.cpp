@@ -1,6 +1,6 @@
 #include "graphics/Pipeline.h"
 
-void Pipeline::initialize(Device* pdevice, RenderPass* prenderpass) {
+void Pipeline::initialize(Device* pdevice, RenderPass* prenderpass, DescriptorSet* pdescriptorset) {
     VkDevice logicalDevice = pdevice->getLogicalDevice();
 
 	auto vertShaderCode = readFile("shaders/vert.spv");
@@ -62,7 +62,9 @@ void Pipeline::initialize(Device* pdevice, RenderPass* prenderpass) {
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL; // The polygonMode determines how fragments are generated for geometry
     rasterizer.lineWidth = 1.0f;
     rasterizer.cullMode = VK_CULL_MODE_BACK_BIT; // Determines the type of face culling to use.
-    rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+    // The problem is that because of the Y-flip we did in the projection matrix,
+    // the vertices are now being drawn in counter-clockwise order instead of clockwise order
+    rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE; 
     rasterizer.depthBiasEnable = VK_FALSE; // This is useful in some cases like shadow maps
     rasterizer.depthBiasConstantFactor = 0.0f; // Optional
     rasterizer.depthBiasClamp = 0.0f; // Optional
@@ -115,8 +117,8 @@ void Pipeline::initialize(Device* pdevice, RenderPass* prenderpass) {
     // To push uniform values in shaders
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 0; // Optional
-    pipelineLayoutInfo.pSetLayouts = nullptr; // Optional
+    pipelineLayoutInfo.setLayoutCount = 1; // Optional
+    pipelineLayoutInfo.pSetLayouts = pdescriptorset->getDescriptorSetLayoutPtr(); // Optional
     pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
     pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
 

@@ -36,7 +36,7 @@ void Renderer::initVulkan() {
     r_descriptorpool.initialize(&r_device); // createDescriptorPool();
     r_descriptorset.initialize(&r_device); // createDescriptorSetLayout();
 
-    r_pipeline.initialize(&r_device, &r_renderpass);
+    r_pipeline.initialize(&r_device, &r_renderpass, &r_descriptorset);
     r_framebuffer.initialize(&r_device, &r_swapchain, &r_imageviews, &r_renderpass);
     r_commandpools.initialize(&r_device);
     r_buffermanager.initialize(&r_device, &r_commandpools); // createUniformBuffers();

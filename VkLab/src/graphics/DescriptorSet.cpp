@@ -67,6 +67,10 @@ void DescriptorSet::allocate(Device* pdevice, DescriptorPool* descriptorPool, Bu
     }
 }
 
+VkDescriptorSetLayout* DescriptorSet::getDescriptorSetLayoutPtr() {
+    return &descriptorSetLayout;
+}
+
 VkDescriptorSet* DescriptorSet::getDescriptorSetPtr(uint32_t index) {
     return &descriptorSets[index];
 }

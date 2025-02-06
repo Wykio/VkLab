@@ -85,16 +85,6 @@ void recordCommandBuffer(
     scissor.extent = pSwapChain->getSwapChainExtent();
     vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-    assert(commandBuffer != VK_NULL_HANDLE);
-    assert(pPipeline != nullptr);
-    assert(pPipeline->getPipelineLayout() != VK_NULL_HANDLE);
-    assert(pDescriptorSet != nullptr);
-    assert(pDescriptorSet->getDescriptorSetPtr(currentFrame) != nullptr);
-
-    std::cout << "CommandBuffer: " << commandBuffer << std::endl;
-    std::cout << "Pipeline Layout: " << pPipeline->getPipelineLayout() << std::endl;
-    std::cout << "DescriptorSet: " << pDescriptorSet->getDescriptorSetPtr(currentFrame) << std::endl;
-
     // Bind Descriptor Sets
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pPipeline->getPipelineLayout(), 0, 1, pDescriptorSet->getDescriptorSetPtr(currentFrame), 0, nullptr);
 
