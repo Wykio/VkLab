@@ -33,10 +33,14 @@ void Renderer::initVulkan() {
     r_swapchain.initialize(window, &r_device);
     r_imageviews.initialize(&r_device, &r_swapchain);
     r_renderpass.initialize(&r_device, &r_swapchain);
+    r_descriptorpool.initialize(&r_device); // createDescriptorPool();
+    r_descriptorset.initialize(&r_device); // createDescriptorSetLayout();
+
     r_pipeline.initialize(&r_device, &r_renderpass);
     r_framebuffer.initialize(&r_device, &r_swapchain, &r_imageviews, &r_renderpass);
     r_commandpools.initialize(&r_device);
-    r_vertexbuffer.initialize(&r_device, &r_commandpools);
+    r_buffermanager.initialize(&r_device, &r_commandpools); // createUniformBuffers();
+    r_descriptorset.allocate(&r_device, &r_descriptorpool, &r_buffermanager); // createDescriptorSets();
     r_commandbuffers.initialize(&r_device, &r_commandpools);
 
     createSyncObjects();
@@ -57,7 +61,9 @@ void Renderer::mainLoop() {
 void Renderer::cleanup() {
     cleanupSwapChain();
 
-    r_vertexbuffer.cleanup(&r_device);
+    r_buffermanager.cleanup(&r_device);
+    r_descriptorpool.cleanup(&r_device);
+    r_descriptorset.cleanup(&r_device);
     r_pipeline.cleanup(&r_device);
     r_renderpass.cleanup(&r_device);
 
@@ -123,11 +129,24 @@ void Renderer::drawFrame() {
         throw std::runtime_error("failed to acquire swap chain image!");
     }
 
+    // Generate a new transformation every frame to make the geometry spin around
+    r_buffermanager.updateUniformBuffer(r_swapchain, currentFrame);
+
     // Only reset the fence if we are submitting work (avoid Deadlock)
     vkResetFences(r_device.getLogicalDevice(), 1, &inFlightFences[currentFrame]);
 
     vkResetCommandBuffer(r_commandbuffers.getCommandBuffer(currentFrame), /*VkCommandBufferResetFlagBits*/ 0);
-    recordCommandBuffer(r_commandbuffers.getCommandBuffer(currentFrame), imageIndex, &r_swapchain, &r_renderpass, &r_pipeline, &r_framebuffer, &r_vertexbuffer);
+    recordCommandBuffer(
+        r_commandbuffers.getCommandBuffer(currentFrame),
+        currentFrame,
+        imageIndex,
+        &r_swapchain,
+        &r_renderpass,
+        &r_descriptorset,
+        &r_pipeline,
+        &r_framebuffer,
+        &r_buffermanager
+    );
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

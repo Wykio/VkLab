@@ -167,6 +167,10 @@ void Pipeline::cleanup(Device* pdevice) {
     }
 }
 
+VkPipelineLayout Pipeline::getPipelineLayout() {
+    return pipelineLayout;
+}
+
 VkPipeline Pipeline::getGraphicsPipeline() {
     return graphicsPipeline;
 }

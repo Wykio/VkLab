@@ -2,11 +2,16 @@
 #define VERTEX_H
 
 #include "core/Device.h"
+#include "core/Constant.h"
+#include "graphics/SwapChain.h"
+#include "graphics/DescriptorSet.h"
 #include "utils/Buffer.h"
 
 #include <vulkan/vulkan.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <array>
+#include <chrono>
 
 struct Vertex
 {
@@ -53,22 +58,30 @@ const std::vector<uint16_t> indices = {
     0, 1, 2, 2, 3, 0
 };
 
-class VertexBuffer
+class BufferManager
 {
 public:
     void initialize(Device* pdevice, CommandPools* pcommandPools);
     void cleanup(Device* pdevice);
+    void updateUniformBuffer(SwapChain swapchain, uint32_t currentImage);
     VkBuffer getVertexBuffer();
     VkBuffer getIndexBuffer();
+    std::vector<VkBuffer> getUniformBuffer();
 
 private: // Note: Try to create a single buffer for both of these with offsets for memory optimisation
     void createVertexBuffer(Device* pdevice, CommandPools* pcommandPools);
     void createIndexBuffer(Device* pdevice, CommandPools* pcommandPools);
+    void createUniformBuffer(Device* pdevice);
 
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
+
     VkBuffer indexBuffer;
     VkDeviceMemory indexBufferMemory;
+
+    std::vector<VkBuffer> uniformBuffers;
+    std::vector<VkDeviceMemory> uniformBuffersMemory;
+    std::vector<void*> uniformBuffersMapped;
 };
 
 #endif // VERTEX_H

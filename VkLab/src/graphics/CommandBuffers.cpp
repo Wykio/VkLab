@@ -28,7 +28,18 @@ VkCommandBuffer* CommandBuffers::getCommandBufferPtr(const int index) {
 }
 
 // We pass the command buffer and the index of the current swapchain image we want to write to
-void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex, SwapChain* pSwapChain, RenderPass* pRenderPass, Pipeline* pPipeline, FrameBuffers* pFrameBuffer, VertexBuffer* pvertexbuffer) {
+void recordCommandBuffer(
+    VkCommandBuffer commandBuffer,
+    uint32_t currentFrame,
+    uint32_t imageIndex,
+    SwapChain* pSwapChain,
+    RenderPass* pRenderPass,
+    DescriptorSet* pDescriptorSet,
+    Pipeline* pPipeline,
+    FrameBuffers* pFrameBuffer,
+    BufferManager* pBufferManager
+) {
+    
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -52,12 +63,12 @@ void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex, Swa
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pPipeline->getGraphicsPipeline());
 
     // Bind the vertex buffer
-    VkBuffer vertexBuffers[] = { pvertexbuffer->getVertexBuffer() };
+    VkBuffer vertexBuffers[] = { pBufferManager->getVertexBuffer() };
     VkDeviceSize offsets[] = { 0 };
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets); // Bind vertex buffers to bindings
 
     // Bind the index buffer
-    VkBuffer indexBuffers = pvertexbuffer->getIndexBuffer();
+    VkBuffer indexBuffers = pBufferManager->getIndexBuffer();
     vkCmdBindIndexBuffer(commandBuffer, indexBuffers, 0, VK_INDEX_TYPE_UINT16);
 
     VkViewport viewport{};
@@ -73,6 +84,19 @@ void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex, Swa
     scissor.offset = { 0, 0 };
     scissor.extent = pSwapChain->getSwapChainExtent();
     vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+
+    assert(commandBuffer != VK_NULL_HANDLE);
+    assert(pPipeline != nullptr);
+    assert(pPipeline->getPipelineLayout() != VK_NULL_HANDLE);
+    assert(pDescriptorSet != nullptr);
+    assert(pDescriptorSet->getDescriptorSetPtr(currentFrame) != nullptr);
+
+    std::cout << "CommandBuffer: " << commandBuffer << std::endl;
+    std::cout << "Pipeline Layout: " << pPipeline->getPipelineLayout() << std::endl;
+    std::cout << "DescriptorSet: " << pDescriptorSet->getDescriptorSetPtr(currentFrame) << std::endl;
+
+    // Bind Descriptor Sets
+    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pPipeline->getPipelineLayout(), 0, 1, pDescriptorSet->getDescriptorSetPtr(currentFrame), 0, nullptr);
 
     //vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0); // Without indexes
     vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);

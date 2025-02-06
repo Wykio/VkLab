@@ -12,7 +12,9 @@
 #include "graphics/FrameBuffers.h"
 #include "graphics/CommandPools.h"
 #include "graphics/CommandBuffers.h"
-#include "graphics/VertexBuffer.h"
+#include "graphics/BufferManager.h"
+#include "graphics/DescriptorSet.h"
+#include "graphics/DescriptorPool.h"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -55,9 +57,11 @@ private:
     ImageViews r_imageviews;
     Pipeline r_pipeline;
     RenderPass r_renderpass;
+    DescriptorPool r_descriptorpool;
+    DescriptorSet r_descriptorset;
     FrameBuffers r_framebuffer;
     CommandPools r_commandpools;
-    VertexBuffer r_vertexbuffer;
+    BufferManager r_buffermanager;
     CommandBuffers r_commandbuffers;
 
     std::vector<VkSemaphore> imageAvailableSemaphores;

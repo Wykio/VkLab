@@ -7,7 +7,7 @@
 #include "graphics/Pipeline.h"
 #include "graphics/FrameBuffers.h"
 #include "graphics/CommandPools.h"
-#include "graphics/VertexBuffer.h"
+#include "graphics/BufferManager.h"
 
 #include <vulkan/vulkan.h>
 
@@ -23,6 +23,16 @@ private:
 	std::vector<VkCommandBuffer> commandBuffers;
 };
 
-void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex, SwapChain* pSwapChain, RenderPass* pRenderPass, Pipeline* pPipeline, FrameBuffers* pFrameBuffer, VertexBuffer* pvertexbuffer);
+void recordCommandBuffer(
+    VkCommandBuffer commandBuffer,
+    uint32_t currentFrame,
+    uint32_t imageIndex,
+    SwapChain* pSwapChain,
+    RenderPass* pRenderPass,
+    DescriptorSet* pDescriptorSet,
+    Pipeline* pPipeline,
+    FrameBuffers* pFrameBuffer,
+    BufferManager* pvertexbuffer
+);
 
 #endif // COMMANDBUFFERS_H
