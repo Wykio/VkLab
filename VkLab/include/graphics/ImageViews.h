@@ -15,8 +15,8 @@
 class ImageViews
 {
 public:
-	void initialize(Device* device, SwapChain* swapchain);
-	void cleanup(Device* device);
+	void initialize(SwapChain* swapchain);
+	void cleanup();
 	std::vector<VkImageView> getSwapChainImageViews();
 
 private:

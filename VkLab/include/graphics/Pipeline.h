@@ -12,8 +12,8 @@
 class Pipeline
 {
 public:
-	void initialize(Device* pdevice, RenderPass* prenderpass, DescriptorSet* pdescriptorset);
-	void cleanup(Device* pdevice);
+	void initialize(RenderPass* prenderpass, DescriptorSet* pdescriptorset);
+	void cleanup();
 	VkPipelineLayout getPipelineLayout();
 	VkPipeline getGraphicsPipeline();
 

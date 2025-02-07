@@ -1,8 +1,6 @@
 #include "graphics/DescriptorSet.h"
 
-void DescriptorSet::initialize(Device* pdevice) {
-    auto logicalDevice = pdevice->getLogicalDevice();
-
+void DescriptorSet::initialize() {
     VkDescriptorSetLayoutBinding uboLayoutBinding{};
     uboLayoutBinding.binding = 0;  // Specify the binding used in the shader
     uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -15,18 +13,18 @@ void DescriptorSet::initialize(Device* pdevice) {
     layoutInfo.bindingCount = 1;
     layoutInfo.pBindings = &uboLayoutBinding;
 
-    if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS) {
+    if (vkCreateDescriptorSetLayout(RendererContext::getInstance().pdevice->getLogicalDevice(), &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS) {
         throw std::runtime_error("failed to create descriptor set layout!");
     }
 }
 
-void DescriptorSet::cleanup(Device* pdevice) {
-    vkDestroyDescriptorSetLayout(pdevice->getLogicalDevice(), descriptorSetLayout, nullptr);
+void DescriptorSet::cleanup() {
+    vkDestroyDescriptorSetLayout(RendererContext::getInstance().pdevice->getLogicalDevice(), descriptorSetLayout, nullptr);
 }
 
 // Allocate all descriptor Sets
-void DescriptorSet::allocate(Device* pdevice, DescriptorPool* descriptorPool, BufferManager* bufferManager) {
-    auto logicalDevice = pdevice->getLogicalDevice();
+void DescriptorSet::allocate(DescriptorPool* descriptorPool, BufferManager* bufferManager) {
+    auto logicalDevice = RendererContext::getInstance().pdevice->getLogicalDevice();
 
     std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, descriptorSetLayout);
 
@@ -46,7 +44,7 @@ void DescriptorSet::allocate(Device* pdevice, DescriptorPool* descriptorPool, Bu
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         // Descriptors are configured with a VkDescriptorBufferInfo
         VkDescriptorBufferInfo bufferInfo{};
-        bufferInfo.buffer = bufferManager->getUniformBuffer()[i];
+        bufferInfo.buffer = bufferManager->getUniformBuffers()[i];
         bufferInfo.offset = 0;
         bufferInfo.range = sizeof(UniformBufferObject);
 

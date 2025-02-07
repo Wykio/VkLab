@@ -1,7 +1,7 @@
 #include "graphics/CommandBuffers.h"
 
 
-void CommandBuffers::initialize(Device* pdevice, CommandPools* pCommandPools) {
+void CommandBuffers::initialize(CommandPools* pCommandPools) {
     commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 
     VkCommandBufferAllocateInfo allocInfo{};
@@ -10,7 +10,7 @@ void CommandBuffers::initialize(Device* pdevice, CommandPools* pCommandPools) {
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY; // Can be submitted to a queue for execution, but cannot be called from other command buffers.
     allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
 
-    if (vkAllocateCommandBuffers(pdevice->getLogicalDevice(), &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(RendererContext::getInstance().pdevice->getLogicalDevice(), &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate command buffers!");
     }
 }

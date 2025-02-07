@@ -13,8 +13,8 @@
 class FrameBuffers
 {
 public:
-	void initialize(Device* pdevice, SwapChain* pSwapChain, ImageViews* pImageViews, RenderPass* pRenderPass);
-    void cleanup(Device* pdevice);
+	void initialize(SwapChain* pSwapChain, ImageViews* pImageViews, RenderPass* pRenderPass);
+    void cleanup();
     const std::vector<VkFramebuffer> getSwapChainFramebuffers();
 
 private:

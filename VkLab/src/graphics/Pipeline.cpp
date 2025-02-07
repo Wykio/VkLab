@@ -1,8 +1,9 @@
 #include "graphics/Pipeline.h"
 
-void Pipeline::initialize(Device* pdevice, RenderPass* prenderpass, DescriptorSet* pdescriptorset) {
-    VkDevice logicalDevice = pdevice->getLogicalDevice();
+void Pipeline::initialize(RenderPass* prenderpass, DescriptorSet* pdescriptorset) {
+    auto logicalDevice = RendererContext::getInstance().pdevice->getLogicalDevice();
 
+    // Load shaders
 	auto vertShaderCode = readFile("shaders/vert.spv");
 	auto fragShaderCode = readFile("shaders/frag.spv");
 	std::cout << "vertShader size: " << vertShaderCode.size() << " octets" << std::endl; // Debug
@@ -117,8 +118,8 @@ void Pipeline::initialize(Device* pdevice, RenderPass* prenderpass, DescriptorSe
     // To push uniform values in shaders
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 1; // Optional
-    pipelineLayoutInfo.pSetLayouts = pdescriptorset->getDescriptorSetLayoutPtr(); // Optional
+    pipelineLayoutInfo.setLayoutCount = 1; // Optional - Used for UBOs
+    pipelineLayoutInfo.pSetLayouts = pdescriptorset->getDescriptorSetLayoutPtr(); // Optional - Used for UBOs
     pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
     pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
 
@@ -158,8 +159,8 @@ void Pipeline::initialize(Device* pdevice, RenderPass* prenderpass, DescriptorSe
     vkDestroyShaderModule(logicalDevice, vertShaderModule, nullptr);
 }
 
-void Pipeline::cleanup(Device* pdevice) {
-    VkDevice logicalDevice = pdevice->getLogicalDevice();
+void Pipeline::cleanup() {
+    auto logicalDevice = RendererContext::getInstance().pdevice->getLogicalDevice();
 
     if (graphicsPipeline != VK_NULL_HANDLE) {
         vkDestroyPipeline(logicalDevice, graphicsPipeline, nullptr);

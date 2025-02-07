@@ -1,14 +1,14 @@
 #include "graphics/BufferManager.h"
 
-void BufferManager::initialize(Device* pdevice, CommandPools* pcommandPools) {
-    createVertexBuffer(pdevice, pcommandPools);
-    createIndexBuffer(pdevice, pcommandPools);
-    createUniformBuffer(pdevice);
+void BufferManager::initialize(CommandPools* pcommandPools) {
+    createVertexBuffer(pcommandPools);
+    createIndexBuffer(pcommandPools);
+    createUniformBuffer();
 }
 
 // Memory that is bound to a buffer object may be freed once the buffer is no longer used
-void BufferManager::cleanup(Device* pdevice) {
-    VkDevice logicalDevice = pdevice->getLogicalDevice();
+void BufferManager::cleanup() {
+    VkDevice logicalDevice = RendererContext::getInstance().pdevice->getLogicalDevice();
 
     vkDestroyBuffer(logicalDevice, indexBuffer, nullptr);
     vkFreeMemory(logicalDevice, indexBufferMemory, nullptr);
@@ -22,6 +22,7 @@ void BufferManager::cleanup(Device* pdevice) {
     }
 }
 
+// Update UBO to turn the model in the scene
 void BufferManager::updateUniformBuffer(SwapChain swapchain, uint32_t currentImage) {
     //  Calculate the time in seconds since rendering has started with floating point accuracy
     static auto startTime = std::chrono::high_resolution_clock::now();
@@ -31,8 +32,8 @@ void BufferManager::updateUniformBuffer(SwapChain swapchain, uint32_t currentIma
 
     // Define the model, view and projection transformations
     UniformBufferObject ubo{};
-    ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f)); // Accomplishes the purpose of rotation 90 degrees per second
-    ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)); // Look at the geometry from above at a 45 degree angle
+    ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(10.0f), glm::vec3(0.0f, 0.0f, 1.0f)); // Accomplishes the purpose of rotation 90 degrees per second
+    ubo.view = glm::lookAt(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)); // Look at the geometry from above at a 45 degree angle
     // Configure FOV, aspect ratio, near view plane, far view plane ..
     // Use the current swap chain extent to calculate the aspect ratio to take into account the new width and height of the window after a resize
     ubo.proj = glm::perspective(glm::radians(45.0f), swapchain.getSwapChainExtent().width / (float) swapchain.getSwapChainExtent().height, 0.1f, 10.0f);
@@ -57,12 +58,12 @@ VkBuffer BufferManager::getIndexBuffer() {
     return indexBuffer;
 }
 
-std::vector<VkBuffer> BufferManager::getUniformBuffer() {
+std::vector<VkBuffer> BufferManager::getUniformBuffers() {
     return uniformBuffers;
 }
 
-void BufferManager::createVertexBuffer(Device* pdevice, CommandPools* pcommandPools) {
-    VkDevice logicalDevice = pdevice->getLogicalDevice();
+void BufferManager::createVertexBuffer(CommandPools* pcommandPools) {
+    VkDevice logicalDevice = RendererContext::getInstance().pdevice->getLogicalDevice();
 
     VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 
@@ -70,7 +71,7 @@ void BufferManager::createVertexBuffer(Device* pdevice, CommandPools* pcommandPo
     VkBuffer stagingBuffer; // For mapping and copying the vertex data.
     VkDeviceMemory stagingBufferMemory;
     createBuffer(
-        pdevice,
+        RendererContext::getInstance().pdevice,
         bufferSize,
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT, // Buffer can be used as source in a memory transfer operation
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -87,7 +88,7 @@ void BufferManager::createVertexBuffer(Device* pdevice, CommandPools* pcommandPo
     vkUnmapMemory(logicalDevice, stagingBufferMemory);
 
     createBuffer(
-        pdevice,
+        RendererContext::getInstance().pdevice,
         bufferSize,
         VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, // Buffer can be used as destination in a memory transfer operation
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, // The vertexBuffer is now allocated from a memory type that is device local
@@ -95,14 +96,14 @@ void BufferManager::createVertexBuffer(Device* pdevice, CommandPools* pcommandPo
         vertexBufferMemory
     );
 
-    copyBuffer(pdevice, pcommandPools->getTransferCommandPool(), stagingBuffer, vertexBuffer, bufferSize);
+    copyBuffer(RendererContext::getInstance().pdevice, pcommandPools->getTransferCommandPool(), stagingBuffer, vertexBuffer, bufferSize);
 
     vkDestroyBuffer(logicalDevice, stagingBuffer, nullptr);
     vkFreeMemory(logicalDevice, stagingBufferMemory, nullptr);
 }
 
-void BufferManager::createIndexBuffer(Device* pdevice, CommandPools* pcommandPools) {
-    VkDevice logicalDevice = pdevice->getLogicalDevice();
+void BufferManager::createIndexBuffer(CommandPools* pcommandPools) {
+    VkDevice logicalDevice = RendererContext::getInstance().pdevice->getLogicalDevice();
 
     VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
 
@@ -110,7 +111,7 @@ void BufferManager::createIndexBuffer(Device* pdevice, CommandPools* pcommandPoo
     VkBuffer stagingBuffer; // For mapping and copying the vertex data.
     VkDeviceMemory stagingBufferMemory;
     createBuffer(
-        pdevice,
+        RendererContext::getInstance().pdevice,
         bufferSize,
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT, // Buffer can be used as source in a memory transfer operation
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -127,7 +128,7 @@ void BufferManager::createIndexBuffer(Device* pdevice, CommandPools* pcommandPoo
     vkUnmapMemory(logicalDevice, stagingBufferMemory);
 
     createBuffer(
-        pdevice,
+        RendererContext::getInstance().pdevice,
         bufferSize,
         VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, // Buffer can be used as destination in a memory transfer operation
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, // The vertexBuffer is now allocated from a memory type that is device local
@@ -135,14 +136,14 @@ void BufferManager::createIndexBuffer(Device* pdevice, CommandPools* pcommandPoo
         indexBufferMemory
     );
 
-    copyBuffer(pdevice, pcommandPools->getTransferCommandPool(), stagingBuffer, indexBuffer, bufferSize);
+    copyBuffer(RendererContext::getInstance().pdevice, pcommandPools->getTransferCommandPool(), stagingBuffer, indexBuffer, bufferSize);
 
     vkDestroyBuffer(logicalDevice, stagingBuffer, nullptr);
     vkFreeMemory(logicalDevice, stagingBufferMemory, nullptr);
 }
 
-void BufferManager::createUniformBuffer(Device* pdevice) {
-    VkDevice logicalDevice = pdevice->getLogicalDevice();
+void BufferManager::createUniformBuffer() {
+    VkDevice logicalDevice = RendererContext::getInstance().pdevice->getLogicalDevice();
 
     VkDeviceSize buffersize = sizeof(UniformBufferObject);
 
@@ -153,7 +154,7 @@ void BufferManager::createUniformBuffer(Device* pdevice) {
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         createBuffer(
-            pdevice,
+            RendererContext::getInstance().pdevice,
             buffersize,
             VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,

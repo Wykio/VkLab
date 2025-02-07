@@ -1,6 +1,11 @@
 #include "graphics/RenderPass.h"
 
-void RenderPass::initialize(Device* pdevice, SwapChain* pswapchain) {
+void RenderPass::initialize(SwapChain* pswapchain) {
+	// Attachments are images or buffers that serve as inputs and outputs during rendering
+	// They include color attachments (e.g., the images you render to) and depth/stencil attachments (used for depth and stencil testing)
+	// Each attachment is described by its format, sample count, and the actions to perform at the beginning and end of the render pass,
+	// such as clearing or preserving their contents.
+	
 	VkAttachmentDescription colorAttachment{}; // Single color attachement for now
 	colorAttachment.format = pswapchain->getSwapChainImageFormat();
 	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -50,13 +55,13 @@ void RenderPass::initialize(Device* pdevice, SwapChain* pswapchain) {
 	renderPassInfo.dependencyCount = 1;
 	renderPassInfo.pDependencies = &dependency;
 
-	if (vkCreateRenderPass(pdevice->getLogicalDevice(), &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
+	if (vkCreateRenderPass(RendererContext::getInstance().pdevice->getLogicalDevice(), &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create render pass!");
 	}
 }
 
-void RenderPass::cleanup(Device* pdevice) {
-	vkDestroyRenderPass(pdevice->getLogicalDevice(), renderPass, nullptr);
+void RenderPass::cleanup() {
+	vkDestroyRenderPass(RendererContext::getInstance().pdevice->getLogicalDevice(), renderPass, nullptr);
 }
 
 VkRenderPass RenderPass::getRenderPass() {

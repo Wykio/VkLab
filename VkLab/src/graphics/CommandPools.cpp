@@ -1,8 +1,8 @@
 #include "graphics/CommandPools.h"
 
-void CommandPools::initialize(Device* pdevice) {
-	VkDevice logicalDevice = pdevice->getLogicalDevice();
-	QueueFamilyIndices queueFamilyIndices = findQueueFamilies(pdevice->getPhysicalDevice());
+void CommandPools::initialize() {
+	VkDevice logicalDevice = RendererContext::getInstance().pdevice->getLogicalDevice();
+	QueueFamilyIndices queueFamilyIndices = findQueueFamilies(RendererContext::getInstance().pdevice->getPhysicalDevice());
 
 	// Drawing command pool create info
 	VkCommandPoolCreateInfo drawPoolInfo{};
@@ -27,8 +27,8 @@ void CommandPools::initialize(Device* pdevice) {
 	}
 }
 
-void CommandPools::cleanup(Device* pdevice) {
-	VkDevice logicalDevice = pdevice->getLogicalDevice();
+void CommandPools::cleanup() {
+	VkDevice logicalDevice = RendererContext::getInstance().pdevice->getLogicalDevice();
 
 	vkDestroyCommandPool(logicalDevice, drawCommandPool, nullptr);
 	vkDestroyCommandPool(logicalDevice, transferCommandPool, nullptr);

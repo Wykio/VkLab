@@ -14,7 +14,7 @@
 class CommandBuffers
 {
 public:
-	void initialize(Device* pdevice, CommandPools* pCommandPool);
+	void initialize(CommandPools* pCommandPool);
 	std::vector<VkCommandBuffer> getCommandBuffers();
 	VkCommandBuffer getCommandBuffer(const int index);
 	VkCommandBuffer* getCommandBufferPtr(const int index); // not a very good practice :/

@@ -10,7 +10,7 @@ static uint32_t findMemoryType(Device* pdevice, uint32_t typeFilter, VkMemoryPro
 static void createBuffer(Device* pdevice, VkDeviceSize deviceSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
 	auto logicalDevice = pdevice->getLogicalDevice();
 	
-	QueueFamilyIndices indices = findQueueFamilies(pdevice->getPhysicalDevice());
+	QueueFamilyIndices indices = findQueueFamilies(RendererContext::getInstance().pdevice->getPhysicalDevice());
 	uint32_t queueFamilyIndices[] = { indices.graphicsFamily.value(), indices.transferFamily.value() };
 
 	// Create the buffer

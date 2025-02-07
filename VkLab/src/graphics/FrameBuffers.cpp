@@ -1,6 +1,6 @@
 #include "graphics/FrameBuffers.h"
 
-void FrameBuffers::initialize(Device* pdevice, SwapChain* pSwapChain, ImageViews* pImageViews, RenderPass* pRenderPass) {
+void FrameBuffers::initialize(SwapChain* pSwapChain, ImageViews* pImageViews, RenderPass* pRenderPass) {
     size_t swapChainImageViewsSize = pImageViews->getSwapChainImageViews().size();
     VkExtent2D swapChainExtent = pSwapChain->getSwapChainExtent();
 
@@ -21,16 +21,15 @@ void FrameBuffers::initialize(Device* pdevice, SwapChain* pSwapChain, ImageViews
         framebufferInfo.height = swapChainExtent.height;
         framebufferInfo.layers = 1; // Our swap chain images are single images, so the number of layers is 1
 
-        if (vkCreateFramebuffer(pdevice->getLogicalDevice(), &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS) {
+        if (vkCreateFramebuffer(RendererContext::getInstance().pdevice->getLogicalDevice(), &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to create framebuffer!");
         }
     }
 }
 
-void FrameBuffers::cleanup(Device* pdevice) {
-    VkDevice logicalDevice = pdevice->getLogicalDevice();
+void FrameBuffers::cleanup() {
     for (auto framebuffer : swapChainFramebuffers) {
-        vkDestroyFramebuffer(logicalDevice, framebuffer, nullptr);
+        vkDestroyFramebuffer(RendererContext::getInstance().pdevice->getLogicalDevice(), framebuffer, nullptr);
     }
 }
 

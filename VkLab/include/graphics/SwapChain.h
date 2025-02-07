@@ -8,13 +8,16 @@
 #include <vector>
 #include <algorithm> // Necessary for std::clamp
 
-class ImageViews; //
+class ImageViews;
 
+// The SwapChain is the infrastructure that will own the buffers we will render to before we visualize them on the screen
+// It is essentially a queue of images that are waiting to be presented to the screen. Our application will acquire
+// such an image to draw to it, and then return it to the queue
 class SwapChain
 {
 public:
-	void initialize(GLFWwindow* window, Device* pdevice);
-	void cleanup(Device* device);
+	void initialize(GLFWwindow* window);
+	void cleanup();
 	const VkSwapchainKHR getSwapChain();
 	const std::vector<VkImage> getSwapChainImages();
 	const VkFormat getSwapChainImageFormat();

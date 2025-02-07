@@ -61,17 +61,17 @@ const std::vector<uint16_t> indices = {
 class BufferManager
 {
 public:
-    void initialize(Device* pdevice, CommandPools* pcommandPools);
-    void cleanup(Device* pdevice);
+    void initialize(CommandPools* pcommandPools);
+    void cleanup();
     void updateUniformBuffer(SwapChain swapchain, uint32_t currentImage);
     VkBuffer getVertexBuffer();
     VkBuffer getIndexBuffer();
-    std::vector<VkBuffer> getUniformBuffer();
+    std::vector<VkBuffer> getUniformBuffers();
 
 private: // Note: Try to create a single buffer for both of these with offsets for memory optimisation
-    void createVertexBuffer(Device* pdevice, CommandPools* pcommandPools);
-    void createIndexBuffer(Device* pdevice, CommandPools* pcommandPools);
-    void createUniformBuffer(Device* pdevice);
+    void createVertexBuffer(CommandPools* pcommandPools);
+    void createIndexBuffer(CommandPools* pcommandPools);
+    void createUniformBuffer();
 
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;

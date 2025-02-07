@@ -1,14 +1,17 @@
 #include "graphics/SwapChain.h"
 
-void SwapChain::initialize(GLFWwindow* pwindow, Device* pdevice) {
-    VkPhysicalDevice physicalDevice = pdevice->getPhysicalDevice();
-    VkDevice logicalDevice = pdevice->getLogicalDevice();
+void SwapChain::initialize(GLFWwindow* pwindow) {
+    VkPhysicalDevice physicalDevice = RendererContext::getInstance().pdevice->getPhysicalDevice();
+    VkDevice logicalDevice = RendererContext::getInstance().pdevice->getLogicalDevice();
     VkSurfaceKHR surface = RendererContext::getInstance().surface;
 
-    //Check for swap chain support
+    // Checks for device/surface support
     SwapChainSupportDetails swapChainSupport = querySwapChainSupport(physicalDevice, surface);
+    // Select surface format
     VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
+    // Select present mode
     VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
+    // Select the resolution of swap chain images
     VkExtent2D extent = chooseSwapExtent(pwindow, swapChainSupport.capabilities);
 
     // How many images we want in the swap chain
@@ -19,6 +22,7 @@ void SwapChain::initialize(GLFWwindow* pwindow, Device* pdevice) {
         imageCount = swapChainSupport.capabilities.maxImageCount;
     }
 
+    // Create the swap chain
     VkSwapchainCreateInfoKHR createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
     createInfo.surface = surface;
@@ -29,7 +33,8 @@ void SwapChain::initialize(GLFWwindow* pwindow, Device* pdevice) {
     createInfo.imageArrayLayers = 1; // always 1 unless you are developing a stereoscopic 3D application.
     createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-    // Specify how to handle swap chain images that will be used across multiple queue families (if graphicsFamily and presentFamily are not the same).
+    // Specify how to handle swap chain images that will be used across multiple queue families
+    // (if graphicsFamily and presentFamily are not the same)
     QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
     uint32_t queueFamilyIndices[] = { indices.graphicsFamily.value(), indices.presentFamily.value() };
 
@@ -52,18 +57,18 @@ void SwapChain::initialize(GLFWwindow* pwindow, Device* pdevice) {
         throw std::runtime_error("failed to create swap chain!");
     }
 
-    // Remember that we only specified a minimum number of images in the swap chain, so the implementation is allowed to create a swap chain with more.
+    // We only specified a minimum number of images in the swap chain, so the implementation is allowed to create a swap chain with more of them
     vkGetSwapchainImagesKHR(logicalDevice, swapChain, &imageCount, nullptr); 
     swapChainImages.resize(imageCount); // That’s why resize the container first
+    // Then we can retrieve the handles of swapChainImages
     vkGetSwapchainImagesKHR(logicalDevice, swapChain, &imageCount, swapChainImages.data());
-
     swapChainImageFormat = surfaceFormat.format;
     swapChainExtent = extent;
 }
 
-void SwapChain::cleanup(Device* device) {
+void SwapChain::cleanup() {
     if (swapChain != VK_NULL_HANDLE) {
-        vkDestroySwapchainKHR(device->getLogicalDevice(), swapChain, nullptr);
+        vkDestroySwapchainKHR(RendererContext::getInstance().pdevice->getLogicalDevice(), swapChain, nullptr);
     }
 }
 
@@ -105,7 +110,7 @@ VkPresentModeKHR SwapChain::chooseSwapPresentMode(const std::vector<VkPresentMod
     return VK_PRESENT_MODE_FIFO_KHR;
 }
 
-// Choose the resolution of the swap chain images
+// Select the resolution of swap chain images
 VkExtent2D SwapChain::chooseSwapExtent(GLFWwindow* window, const VkSurfaceCapabilitiesKHR& capabilities) {
     // By default, return the currentExtent
     if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {

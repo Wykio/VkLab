@@ -1,16 +1,15 @@
 #include "graphics/ImageViews.h"
 
 // Create an image view for each swapchainImages
-void ImageViews::initialize(Device* device, SwapChain* swapchain) {
+void ImageViews::initialize(SwapChain* swapchain) {
 	std::vector<VkImage> swapchainImages = swapchain->getSwapChainImages();
-
 	swapChainImageViews.resize(swapchainImages.size());
 
 	for (size_t i = 0; i < swapchainImages.size(); i++) {
+		// Create an image view
 		VkImageViewCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 		createInfo.image = swapchain->getSwapChainImages()[i];
-
 		createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D; // 2D textures
 		createInfo.format = swapchain->getSwapChainImageFormat();
 
@@ -29,17 +28,16 @@ void ImageViews::initialize(Device* device, SwapChain* swapchain) {
 		createInfo.subresourceRange.baseArrayLayer = 0;
 		createInfo.subresourceRange.layerCount = 1;
 
-		if (vkCreateImageView(device->getLogicalDevice(), &createInfo, nullptr, &swapChainImageViews[i]) != VK_SUCCESS) {
+		if (vkCreateImageView(RendererContext::getInstance().pdevice->getLogicalDevice(), &createInfo, nullptr, &swapChainImageViews[i]) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create image views!");
 		}
 	}
 }
 
 // Destroy every image views
-void ImageViews::cleanup(Device* device) {
-	VkDevice logicalDevice = device->getLogicalDevice();
+void ImageViews::cleanup() {
 	for (auto imageView : swapChainImageViews) {
-		vkDestroyImageView(logicalDevice, imageView, nullptr);
+		vkDestroyImageView(RendererContext::getInstance().pdevice->getLogicalDevice(), imageView, nullptr);
 	}
 }
 

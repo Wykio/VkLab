@@ -11,8 +11,8 @@
 class DescriptorPool
 {
 public:
-	void initialize(Device* pdevice);
-	void cleanup(Device* pdevice);
+	void initialize();
+	void cleanup();
 	VkDescriptorPool getDescriptorPool();
 
 private:

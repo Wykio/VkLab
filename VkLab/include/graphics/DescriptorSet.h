@@ -22,9 +22,9 @@ struct UniformBufferObject {
 class DescriptorSet
 {
 public:
-	void initialize(Device* pdevice);
-    void cleanup(Device* pdevice);
-    void allocate(Device* pdevice, DescriptorPool* descriptorPool, BufferManager* bufferManager);
+	void initialize();
+    void cleanup();
+    void allocate(DescriptorPool* descriptorPool, BufferManager* bufferManager);
     VkDescriptorSetLayout* getDescriptorSetLayoutPtr();
     VkDescriptorSet* getDescriptorSetPtr(uint32_t index);
 

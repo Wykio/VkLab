@@ -1,6 +1,6 @@
 #include "graphics/DescriptorPool.h"
 
-void DescriptorPool::initialize(Device* pdevice) {
+void DescriptorPool::initialize() {
 	// Describe which descriptor types our descriptor sets are going to contain
 	VkDescriptorPoolSize poolSize{};
 	poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -16,13 +16,13 @@ void DescriptorPool::initialize(Device* pdevice) {
 	// we also need to specify the maximum number of descriptor sets that may be allocated
 	poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 
-	if (vkCreateDescriptorPool(pdevice->getLogicalDevice(), &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
+	if (vkCreateDescriptorPool(RendererContext::getInstance().pdevice->getLogicalDevice(), &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create descriptor pool!");
 	}
 }
 
-void DescriptorPool::cleanup(Device* pdevice) {
-	vkDestroyDescriptorPool(pdevice->getLogicalDevice(), descriptorPool, nullptr);
+void DescriptorPool::cleanup() {
+	vkDestroyDescriptorPool(RendererContext::getInstance().pdevice->getLogicalDevice(), descriptorPool, nullptr);
 }
 
 VkDescriptorPool DescriptorPool::getDescriptorPool() {

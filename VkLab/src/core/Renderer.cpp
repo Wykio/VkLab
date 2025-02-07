@@ -1,5 +1,6 @@
 #include "Core/Renderer.h"
 
+// Main function
 void Renderer::run() {
     initWindow();
     initVulkan();
@@ -7,7 +8,7 @@ void Renderer::run() {
     cleanup();
 }
 
-// Initializes a GLFW window without an OpenGL context.
+// Initializes a GLFW window without an OpenGL context
 void Renderer::initWindow() {
     glfwInit();
 
@@ -19,7 +20,7 @@ void Renderer::initWindow() {
     glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 }
 
-// Initializes Vulkan components needed for the application.
+// Initializes Vulkan components needed for the application
 void Renderer::initVulkan() {
     r_instance.initialize();
 
@@ -30,18 +31,18 @@ void Renderer::initVulkan() {
     createSurface();
 
     r_device.initialize(r_instance.getInstance());
-    r_swapchain.initialize(window, &r_device);
-    r_imageviews.initialize(&r_device, &r_swapchain);
-    r_renderpass.initialize(&r_device, &r_swapchain);
-    r_descriptorpool.initialize(&r_device); // createDescriptorPool();
-    r_descriptorset.initialize(&r_device); // createDescriptorSetLayout();
-
-    r_pipeline.initialize(&r_device, &r_renderpass, &r_descriptorset);
-    r_framebuffer.initialize(&r_device, &r_swapchain, &r_imageviews, &r_renderpass);
-    r_commandpools.initialize(&r_device);
-    r_buffermanager.initialize(&r_device, &r_commandpools); // createUniformBuffers();
-    r_descriptorset.allocate(&r_device, &r_descriptorpool, &r_buffermanager); // createDescriptorSets();
-    r_commandbuffers.initialize(&r_device, &r_commandpools);
+    RendererContext::getInstance().pdevice = &r_device;
+    r_swapchain.initialize(window);
+    r_imageviews.initialize(&r_swapchain);
+    r_renderpass.initialize(&r_swapchain);
+    r_descriptorpool.initialize();
+    r_descriptorset.initialize();
+    r_pipeline.initialize(&r_renderpass, &r_descriptorset);
+    r_framebuffer.initialize(&r_swapchain, &r_imageviews, &r_renderpass);
+    r_commandpools.initialize();
+    r_buffermanager.initialize(&r_commandpools);
+    r_descriptorset.allocate(&r_descriptorpool, &r_buffermanager); // UBO must be set
+    r_commandbuffers.initialize(&r_commandpools);
 
     createSyncObjects();
 }
@@ -54,33 +55,35 @@ void Renderer::mainLoop() {
     }
 
     // We should wait for the logical device to finish operations before exiting mainLoop and destroying the window
-    vkDeviceWaitIdle(r_device.getLogicalDevice());
+    vkDeviceWaitIdle(RendererContext::getInstance().pdevice->getLogicalDevice());
 }
 
 // Cleans up all Vulkan and GLFW resources.
 void Renderer::cleanup() {
+    auto& context = RendererContext::getInstance();
+
     cleanupSwapChain();
 
-    r_buffermanager.cleanup(&r_device);
-    r_descriptorpool.cleanup(&r_device);
-    r_descriptorset.cleanup(&r_device);
-    r_pipeline.cleanup(&r_device);
-    r_renderpass.cleanup(&r_device);
+    r_buffermanager.cleanup();
+    r_descriptorpool.cleanup();
+    r_descriptorset.cleanup();
+    r_pipeline.cleanup();
+    r_renderpass.cleanup();
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        vkDestroySemaphore(r_device.getLogicalDevice(), renderFinishedSemaphores[i], nullptr);
-        vkDestroySemaphore(r_device.getLogicalDevice(), imageAvailableSemaphores[i], nullptr);
-        vkDestroyFence(r_device.getLogicalDevice(), inFlightFences[i], nullptr);
+        vkDestroySemaphore(context.pdevice->getLogicalDevice(), renderFinishedSemaphores[i], nullptr);
+        vkDestroySemaphore(context.pdevice->getLogicalDevice(), imageAvailableSemaphores[i], nullptr);
+        vkDestroyFence(context.pdevice->getLogicalDevice(), inFlightFences[i], nullptr);
     }
 
-    r_commandpools.cleanup(&r_device);
-    r_device.cleanup();
+    r_commandpools.cleanup();
+    context.pdevice->cleanup();
 
     if (enableValidationLayers) {
         r_debugMessenger.cleanup(r_instance.getInstance());
     }
 
-    vkDestroySurfaceKHR(r_instance.getInstance(), RendererContext::getInstance().surface, nullptr);
+    vkDestroySurfaceKHR(r_instance.getInstance(), context.surface, nullptr);
     r_instance.cleanup();
 
     glfwDestroyWindow(window);
@@ -116,13 +119,14 @@ void Renderer::drawFrame() {
     //Because we re-record the command buffer every frame, we cannot record the next frame’s work to the command buffer
     // until the current frame has finished executing, as we don’t want to overwrite the current contents of
     // the command buffer while the GPU is using it.
+    auto& context = RendererContext::getInstance();
 
     // - Wait for the previous frame to finish
-    vkWaitForFences(r_device.getLogicalDevice(), 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
+    vkWaitForFences(context.pdevice->getLogicalDevice(), 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
     
     uint32_t imageIndex;
     // Recall that the swap chain is an extension feature, so we must use a function with the vk*KHR naming convention
-    VkResult result = vkAcquireNextImageKHR(r_device.getLogicalDevice(), r_swapchain.getSwapChain(), UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+    VkResult result = vkAcquireNextImageKHR(context.pdevice->getLogicalDevice(), r_swapchain.getSwapChain(), UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         recreateSwapChain();
     } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) { // VK_SUBOPTIMAL_KHR is ok because we still have an image
@@ -133,7 +137,7 @@ void Renderer::drawFrame() {
     r_buffermanager.updateUniformBuffer(r_swapchain, currentFrame);
 
     // Only reset the fence if we are submitting work (avoid Deadlock)
-    vkResetFences(r_device.getLogicalDevice(), 1, &inFlightFences[currentFrame]);
+    vkResetFences(context.pdevice->getLogicalDevice(), 1, &inFlightFences[currentFrame]);
 
     vkResetCommandBuffer(r_commandbuffers.getCommandBuffer(currentFrame), /*VkCommandBufferResetFlagBits*/ 0);
     recordCommandBuffer(
@@ -165,7 +169,7 @@ void Renderer::drawFrame() {
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores; // Specify which semaphores to signal once the command buffer(s) have finished execution
 
-    if (vkQueueSubmit(r_device.getGraphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS) {
+    if (vkQueueSubmit(context.pdevice->getGraphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS) {
         throw std::runtime_error("failed to submit draw command buffer!");
     }
 
@@ -185,7 +189,7 @@ void Renderer::drawFrame() {
     // With 1 swapChain, you can simply use the return value of the vkQueuePresentKHR function.
 
     // Submits the request to present an image to the swap chain.
-    result = vkQueuePresentKHR(r_device.getPresentQueue(), &presentInfo);
+    result = vkQueuePresentKHR(context.pdevice->getPresentQueue(), &presentInfo);
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) { // Because we want the best possible result.
         framebufferResized = false; // Ensure that the semaphores are in a consistent state, otherwise a signaled semaphore may never be properly waited upon
         recreateSwapChain();
@@ -199,6 +203,8 @@ void Renderer::drawFrame() {
 }
 
 void Renderer::createSyncObjects() {
+    auto& context = RendererContext::getInstance();
+
     imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
     renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
     inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
@@ -211,9 +217,9 @@ void Renderer::createSyncObjects() {
     fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT; // To be signaled the first time we wait for it
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        if (vkCreateSemaphore(r_device.getLogicalDevice(), &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
-            vkCreateSemaphore(r_device.getLogicalDevice(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
-            vkCreateFence(r_device.getLogicalDevice(), &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) {
+        if (vkCreateSemaphore(context.pdevice->getLogicalDevice(), &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
+            vkCreateSemaphore(context.pdevice->getLogicalDevice(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
+            vkCreateFence(context.pdevice->getLogicalDevice(), &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) {
 
             throw std::runtime_error("failed to create synchronization objects for a frame!");
         }
@@ -221,9 +227,9 @@ void Renderer::createSyncObjects() {
 }
 
 void Renderer::cleanupSwapChain() {
-    r_framebuffer.cleanup(&r_device);
-    r_imageviews.cleanup(&r_device);
-    r_swapchain.cleanup(&r_device);
+    r_framebuffer.cleanup();
+    r_imageviews.cleanup();
+    r_swapchain.cleanup();
 }
 
 void Renderer::recreateSwapChain() {
@@ -235,14 +241,13 @@ void Renderer::recreateSwapChain() {
         glfwWaitEvents(); // While frame buffer size is 0 -> wait()
     }
 
-    auto logicalDevice = r_device.getLogicalDevice();
-    vkDeviceWaitIdle(logicalDevice); // We shouldn’t touch resources that may still be in use
+    vkDeviceWaitIdle(RendererContext::getInstance().pdevice->getLogicalDevice()); // We shouldn’t touch resources that may still be in use
 
     cleanupSwapChain();
 
-    r_swapchain.initialize(window, &r_device);
-    r_imageviews.initialize(&r_device, &r_swapchain);
-    r_framebuffer.initialize(&r_device, &r_swapchain, &r_imageviews, &r_renderpass);
+    r_swapchain.initialize(window);
+    r_imageviews.initialize(&r_swapchain);
+    r_framebuffer.initialize(&r_swapchain, &r_imageviews, &r_renderpass);
 }
 
 // GLFW does not know how to properly call a member function with the right this pointer to our instance

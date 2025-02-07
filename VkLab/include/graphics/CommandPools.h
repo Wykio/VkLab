@@ -8,8 +8,8 @@
 class CommandPools
 {
 public:
-	void initialize(Device* pdevice);
-	void cleanup(Device* pdevice);
+	void initialize();
+	void cleanup();
 	VkCommandPool getDrawCommandPool();
 	VkCommandPool getTransferCommandPool();
 
