@@ -33,6 +33,7 @@
     <ClInclude Include="include\core\VulkanInstance.h" />
     <ClInclude Include="include\graphics\RenderPass.h" />
     <ClInclude Include="include\graphics\BufferManager.h" />
+    <ClInclude Include="include\graphics\TextureImage.h" />
     <ClInclude Include="include\utils\Buffer.h" />
     <ClInclude Include="include\utils\DebugMessenger.h" />
     <ClInclude Include="include\core\Renderer.h" />
@@ -113,7 +114,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.296.0\Include;C:\Users\pilli\source\repos\VkLab\VkLab\include;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glm;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.296.0\Include;C:\Users\pilli\source\repos\VkLab\VkLab\include;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glm;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\stb;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -131,7 +132,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.296.0\Include;C:\Users\pilli\source\repos\VkLab\VkLab\include;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glm;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.296.0\Include;C:\Users\pilli\source\repos\VkLab\VkLab\include;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glm;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\stb;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -149,7 +150,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.296.0\Include;C:\Users\pilli\source\repos\VkLab\VkLab\include;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glm;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\antoi\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\antoi\Documents\Visual Studio 2022\Libraries\glm;C:\Users\antoi\source\repos\VkLab\VkLab\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.296.0\Include;C:\Users\pilli\source\repos\VkLab\VkLab\include;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glm;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\stb;C:\Users\antoi\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\antoi\Documents\Visual Studio 2022\Libraries\glm;C:\Users\antoi\source\repos\VkLab\VkLab\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -167,7 +168,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.296.0\Include;C:\Users\pilli\source\repos\VkLab\VkLab\include;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glm;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\antoi\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\antoi\Documents\Visual Studio 2022\Libraries\glm;C:\Users\antoi\source\repos\VkLab\VkLab\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.296.0\Include;C:\Users\pilli\source\repos\VkLab\VkLab\include;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glm;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\pilli\Documents\Visual Studio 2022\Libraries\stb;C:\Users\antoi\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\antoi\Documents\Visual Studio 2022\Libraries\glm;C:\Users\antoi\source\repos\VkLab\VkLab\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
