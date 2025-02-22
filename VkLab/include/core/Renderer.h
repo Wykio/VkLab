@@ -12,6 +12,7 @@
 #include "graphics/FrameBuffers.h"
 #include "graphics/CommandPools.h"
 #include "graphics/CommandBuffers.h"
+#include "graphics/TextureImage.h"
 #include "graphics/BufferManager.h"
 #include "graphics/DescriptorSet.h"
 #include "graphics/DescriptorPool.h"
@@ -61,6 +62,7 @@ private:
     DescriptorSet r_descriptorset;
     FrameBuffers r_framebuffer;
     CommandPools r_commandpools;
+    TextureImage r_textureimage;
     BufferManager r_buffermanager;
     CommandBuffers r_commandbuffers;
 

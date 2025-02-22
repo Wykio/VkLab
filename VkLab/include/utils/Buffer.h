@@ -1,13 +1,16 @@
+#ifndef BUFFER_H
+#define BUFFER_H
+
 #include "core/Device.h"
 #include "graphics/CommandPools.h"
 
 #include <vulkan/vulkan.h>
 
-static void createBuffer(Device* pdevice, VkDeviceSize deviceSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
-static uint32_t findMemoryType(Device* pdevice, uint32_t typeFilter, VkMemoryPropertyFlags properties);
+inline void createBuffer(Device* pdevice, VkDeviceSize deviceSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+inline uint32_t findMemoryType(Device* pdevice, uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 // Function to create many different types of buffers. The last two parameters are output variables to write the handles to.
-static void createBuffer(Device* pdevice, VkDeviceSize deviceSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
+inline void createBuffer(Device* pdevice, VkDeviceSize deviceSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
 	auto logicalDevice = pdevice->getLogicalDevice();
 	
 	QueueFamilyIndices indices = findQueueFamilies(RendererContext::getInstance().pdevice->getPhysicalDevice());
@@ -54,7 +57,7 @@ static void createBuffer(Device* pdevice, VkDeviceSize deviceSize, VkBufferUsage
 }
 
 // Copy the contents from one buffer to another using a transfer command pool
-static void copyBuffer(Device* pdevice, VkCommandPool commandPool, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
+inline void copyBuffer(Device* pdevice, VkCommandPool commandPool, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
 	auto logicalDevice = pdevice->getLogicalDevice();
 	auto transferQueue = pdevice->getTransferQueue();
 
@@ -100,7 +103,7 @@ static void copyBuffer(Device* pdevice, VkCommandPool commandPool, VkBuffer srcB
 }
 
 // typeFilter parameter is used to specify the bit field of memory types that are suitable
-static uint32_t findMemoryType(Device* pdevice, uint32_t typeFilter, VkMemoryPropertyFlags properties) {
+inline uint32_t findMemoryType(Device* pdevice, uint32_t typeFilter, VkMemoryPropertyFlags properties) {
 	// Query about the available types of memory
 	VkPhysicalDeviceMemoryProperties memProperties;
 	vkGetPhysicalDeviceMemoryProperties(pdevice->getPhysicalDevice(), &memProperties);
@@ -115,3 +118,5 @@ static uint32_t findMemoryType(Device* pdevice, uint32_t typeFilter, VkMemoryPro
 
 	throw std::runtime_error("failed to find suitable memory type!");
 }
+
+#endif // BUFFER_H
