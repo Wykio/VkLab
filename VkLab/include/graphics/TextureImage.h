@@ -2,6 +2,7 @@
 #define TEXTURE_IMAGE_H
 
 #include "utils/Buffer.h"
+#include "utils/Image.h"
 
 #include <vulkan/vulkan.h>
 #include <stdexcept>

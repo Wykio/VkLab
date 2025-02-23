@@ -37,6 +37,7 @@
     <ClInclude Include="include\utils\Buffer.h" />
     <ClInclude Include="include\utils\DebugMessenger.h" />
     <ClInclude Include="include\core\Renderer.h" />
+    <ClInclude Include="include\utils\Image.h" />
     <ClInclude Include="include\utils\shaderUtils.h" />
   </ItemGroup>
   <ItemGroup>
