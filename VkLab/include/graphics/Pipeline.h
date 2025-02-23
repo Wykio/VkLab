@@ -8,6 +8,8 @@
 
 #include <iostream>
 
+class DescriptorSet;
+
 // The Pipeline is assembled with the renderpass infos and shaders
 class Pipeline
 {
