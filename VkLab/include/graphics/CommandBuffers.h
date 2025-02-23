@@ -13,12 +13,7 @@
 #include <vulkan/vulkan.h>
 #include <vector>
 
-class SwapChain;
-class RenderPass;
-class DescriptorSet;
 class Pipeline;
-class FrameBuffers;
-class CommandPools;
 class BufferManager;
 
 class CommandBuffers
@@ -44,8 +39,5 @@ void recordCommandBuffer(
     FrameBuffers* pFrameBuffer,
     BufferManager* pvertexbuffer
 );
-
-VkCommandBuffer beginSingleTimeCommands(VkCommandPool commandPool);
-void endSingleTimeCommands(VkCommandPool commandPool, VkCommandBuffer commandBuffer);
 
 #endif // COMMANDBUFFERS_H

@@ -3,7 +3,7 @@
 
 #include "core/Device.h"
 #include "graphics/CommandPools.h"
-#include "graphics/CommandBuffers.h"
+#include "utils/CommandBuffersUtils.h"
 
 #include <vulkan/vulkan.h>
 
@@ -62,45 +62,16 @@ inline void copyBuffer(Device* pdevice, VkCommandPool commandPool, VkBuffer srcB
 	auto logicalDevice = pdevice->getLogicalDevice();
 	auto transferQueue = pdevice->getTransferQueue();
 
-	// Allocate a temporary command buffer
-	VkCommandBufferAllocateInfo allocInfo{};
-	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandPool = commandPool;
-	allocInfo.commandBufferCount = 1;
-
-	VkCommandBuffer commandBuffer;
-	vkAllocateCommandBuffers(logicalDevice, &allocInfo, &commandBuffer);
-
-	// Start recording the commandBuffer;
-	VkCommandBufferBeginInfo beginInfo{};
-	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	// We’re only going to use the command buffer once and wait with returning from the function until the copy operation has finished executing
-	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-	vkBeginCommandBuffer(commandBuffer, &beginInfo);
+	// Begin recording
+	VkCommandBuffer commandBuffer = beginSingleTimeCommands(pdevice, commandPool);
 
 	// Transfer buffer content
 	VkBufferCopy copyRegion{};
-	copyRegion.srcOffset = 0; // Optional
-	copyRegion.dstOffset = 0; // Optional
 	copyRegion.size = size;
 	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 
-	// End recording
-	vkEndCommandBuffer(commandBuffer);
-
-	// Send command buffer to the queue and wait for it to finish
-	VkSubmitInfo submitInfo{};
-	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &commandBuffer;
-
-	vkQueueSubmit(transferQueue, 1, &submitInfo, VK_NULL_HANDLE);
-	vkQueueWaitIdle(transferQueue);
-
-	// Free the commandBuffer
-	vkFreeCommandBuffers(logicalDevice, commandPool, 1, &commandBuffer);
+	// End recording and submit to the transfer queue
+	endSingleTimeCommands(pdevice, commandPool, commandBuffer);
 }
 
 // typeFilter parameter is used to specify the bit field of memory types that are suitable

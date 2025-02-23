@@ -35,6 +35,7 @@
     <ClInclude Include="include\graphics\BufferManager.h" />
     <ClInclude Include="include\graphics\TextureImage.h" />
     <ClInclude Include="include\utils\Buffer.h" />
+    <ClInclude Include="include\utils\CommandBuffersUtils.h" />
     <ClInclude Include="include\utils\DebugMessenger.h" />
     <ClInclude Include="include\core\Renderer.h" />
     <ClInclude Include="include\utils\Image.h" />
