@@ -40,7 +40,7 @@ void Renderer::initVulkan() {
     r_pipeline.initialize(&r_renderpass, &r_descriptorset);
     r_framebuffer.initialize(&r_swapchain, &r_imageviews, &r_renderpass);
     r_commandpools.initialize();
-    r_textureimage.initialize();
+    r_textureimage.initialize(r_commandpools);
     r_buffermanager.initialize(&r_commandpools);
     r_descriptorset.allocate(&r_descriptorpool, &r_buffermanager); // UBO must be set
     r_commandbuffers.initialize(&r_commandpools);
@@ -65,6 +65,7 @@ void Renderer::cleanup() {
 
     cleanupSwapChain();
 
+    r_textureimage.cleanup();
     r_buffermanager.cleanup();
     r_descriptorpool.cleanup();
     r_descriptorset.cleanup();

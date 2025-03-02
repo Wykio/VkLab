@@ -5,6 +5,8 @@
 
 #include <vulkan/vulkan.h>
 
+class Device;
+
 class CommandPools
 {
 public:

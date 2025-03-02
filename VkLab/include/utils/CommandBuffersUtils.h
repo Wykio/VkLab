@@ -5,8 +5,10 @@
 
 #include <vulkan/vulkan.h>
 
+//class Device;
+
 // Begin a one time single use command buffer
-inline VkCommandBuffer beginSingleTimeCommands(Device* pdevice, VkCommandPool commandPool) {
+inline VkCommandBuffer beginSingleTimeCommands(VkDevice device, VkCommandPool commandPool) {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
@@ -14,7 +16,7 @@ inline VkCommandBuffer beginSingleTimeCommands(Device* pdevice, VkCommandPool co
     allocInfo.commandBufferCount = 1;
 
     VkCommandBuffer commandBuffer;
-    vkAllocateCommandBuffers(pdevice->getLogicalDevice(), &allocInfo, &commandBuffer);
+    vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer);
 
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -25,10 +27,8 @@ inline VkCommandBuffer beginSingleTimeCommands(Device* pdevice, VkCommandPool co
     return commandBuffer;
 }
 
-// End a one time single use command buffer
-inline void endSingleTimeCommands(Device* pdevice, VkCommandPool commandPool, VkCommandBuffer commandBuffer) {
-    auto graphicsQueue = pdevice->getTransferQueue();
-
+// End a one time single use command buffer and submit to transfer queue
+inline void endSingleTimeCommands(VkDevice device, VkQueue queue, VkCommandPool commandPool, VkCommandBuffer commandBuffer) {
     vkEndCommandBuffer(commandBuffer);
 
     VkSubmitInfo submitInfo{};
@@ -36,10 +36,10 @@ inline void endSingleTimeCommands(Device* pdevice, VkCommandPool commandPool, Vk
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &commandBuffer;
 
-    vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
-    vkQueueWaitIdle(graphicsQueue);
+    vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE);
+    vkQueueWaitIdle(queue);
 
-    vkFreeCommandBuffers(pdevice->getLogicalDevice(), commandPool, 1, &commandBuffer);
+    vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
 }
 
 #endif // COMMAND_BUFFERS_UTILS
